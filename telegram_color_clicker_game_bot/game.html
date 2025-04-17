@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
-    <title>Color Label Game</title>
+    <title>Color Clicker Game</title>
   </head>
   <body>
     <style>
@@ -177,7 +177,7 @@
       }
     </style>
     <div class="game-container">
-      <h1>🎨 Color Label Game</h1>
+      <h1>🎨 Color Clicker Game</h1>
       <p>Click the rectangle with the correct color label!</p>
 
       <div class="score-container">
@@ -186,6 +186,11 @@
       </div>
       <div class="difficulty">🚀 Speed: <span id="difficulty">1x</span></div>
       <div class="timer" id="timer"></div>
+
+      <div style="margin: 0 auto;">
+        <span id="userId">User ID: N/A</span>
+        <span id="chatId">Chat ID: N/A</span>
+      </div>
 
       <div class="color-options" id="colorOptions">
         <!-- Color boxes will be inserted here by JavaScript -->
@@ -276,6 +281,12 @@
       const nameModal = document.getElementById("nameModal");
       const playerNameInput = document.getElementById("playerName");
       const submitNameBtn = document.getElementById("submitName");
+
+      const userIdSpan = document.getElementById("userId");
+      const chatIdSpan = document.getElementById("chatId");
+
+      userIdSpan.textContent=userId;
+      chatIdSpan.textContent=chatId;
 
       // Check if running in Telegram WebApp
       function checkTelegramWebApp() {
