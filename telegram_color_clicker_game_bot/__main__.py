@@ -21,7 +21,7 @@ from telegram.ext import ApplicationBuilder, Application, InlineQueryHandler
 GAME_SHORT_NAME: str = "color_clicker"
 LOGGER_FORMAT: str = '%(asctime)s | %(levelname)s | %(message)s | %(name)s | %(funcName)s'
 
-flask_app = Flask(__name__)
+app = Flask(__name__)
 
 def ensure_event_loop():
     try:
@@ -31,7 +31,7 @@ def ensure_event_loop():
         asyncio.set_event_loop(loop)
     return loop
 
-@flask_app.route("/game")
+@app.route("/game")
 def serve_game():
     return send_from_directory(".", "game.html")
 
@@ -137,7 +137,7 @@ def main():
     bot: TelegramBot = TelegramBot(game_url=game_url, token=token)
     
     def run_http_server():
-        flask_app.run(host="0.0.0.0", port=args.port)
+        app.run(host="0.0.0.0", port=args.port, debug=False, use_reloader=False)
     
     if args.run_http_server:
         # Start bot polling in background
