@@ -187,7 +187,7 @@
       <div class="difficulty">🚀 Speed: <span id="difficulty">1x</span></div>
       <div class="timer" id="timer"></div>
 
-      <div style="margin: 0 auto;">
+      <div style="margin: 0 auto">
         <span id="userId">User ID: N/A</span>
         <span id="chatId">Chat ID: N/A</span>
       </div>
@@ -285,8 +285,13 @@
       const userIdSpan = document.getElementById("userId");
       const chatIdSpan = document.getElementById("chatId");
 
-      userIdSpan.textContent="UserID: " + userId.toString();
-      chatIdSpan.textContent="ChatID: " + chatId.toString();
+      if (userId) {
+        userIdSpan.textContent = "UserID: " + userId.toString();
+      }
+
+      if (chatId) {
+        chatIdSpan.textContent = "ChatID: " + chatId.toString();
+      }
 
       // Check if running in Telegram WebApp
       function checkTelegramWebApp() {
