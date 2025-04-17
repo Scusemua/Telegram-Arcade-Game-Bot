@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Label Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+            padding: 20px;
+            margin: 0;
+        }
+        .game-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .score {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .timer {
+            height: 10px;
+            background-color: #4CAF50;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            transition: width 0.1s linear;
+        }
+        .color-options {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+        }
+        .color-box {
+            width: 150px;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 1px black;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+            transition: transform 0.1s;
+        }
+        .color-box:active {
+            transform: scale(0.95);
+        }
+        .message {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            min-height: 30px;
+        }
+        .start-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .start-btn:hover {
+            background-color: #45a049;
+        }
+        .difficulty {
+            margin-top: 10px;
+            margin-bottom: 8px;
+            font-size: 16px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🎨 Color Label Game</h1>
+        <p>Click the rectangle with the correct color label!</p>
+        
+        <div class="score">Score: <span id="score">0</span></div>
+        <div class="difficulty">🚀 Speed: <span id="difficulty">1x</span></div>
+        <div class="timer" id="timer"></div>
+        
+        <div class="color-options" id="colorOptions">
+            <!-- Color boxes will be inserted here by JavaScript -->
+        </div>
+        
+        <div class="message" id="message"></div>
+        
+        <button class="start-btn" id="startBtn">Start Game</button>
+    </div>
+
+    <script>
+        const colors = [
+            'red', 'blue', 'green', 'yellow', 'orange', 
+            'purple', 'pink', 'cyan', 'magenta'
+        ];
+        
+        // Game settings
+        const BASE_TIMER_SPEED = 100; // ms between updates (lower value = faster timer)
+        const MAX_SPEED_MULTIPLIER = 10; // Maximum speed increase
+        const SPEED_INCREASE_RATE = 0.25; // How much speed increases per point
+        
+        let score = 0;
+        let timerWidth = 100;
+        let timerInterval;
+        let gameActive = false;
+        let correctIndex;
+        let currentSpeedMultiplier = 1;
+        
+        const scoreElement = document.getElementById('score');
+        const timerElement = document.getElementById('timer');
+        const colorOptionsElement = document.getElementById('colorOptions');
+        const messageElement = document.getElementById('message');
+        const startBtn = document.getElementById('startBtn');
+        const difficultyElement = document.getElementById('difficulty');
+        
+        startBtn.addEventListener('click', startGame);
+        
+        function startGame() {
+            score = 0;
+            currentSpeedMultiplier = 1;
+            scoreElement.textContent = score;
+            difficultyElement.textContent = '1x';
+            messageElement.textContent = '';
+            startBtn.style.display = 'none';
+            gameActive = true;
+            nextRound();
+        }
+        
+        function nextRound() {
+            // Clear previous options
+            colorOptionsElement.innerHTML = '';
+            
+            // Reset timer
+            clearInterval(timerInterval);
+            timerWidth = 100;
+            timerElement.style.width = '100%';
+            timerElement.style.backgroundColor = '#4CAF50';
+            
+            // Generate two random colors
+            const shuffledColors = [...colors].sort(() => 0.5 - Math.random());
+            const color1 = shuffledColors[0];
+            const color2 = shuffledColors[1];
+            
+            // Decide which one will be correct (randomly)
+            correctIndex = Math.random() < 0.5 ? 0 : 1;
+            
+            // Create the color boxes
+            for (let i = 0; i < 2; i++) {
+                const box = document.createElement('div');
+                box.className = 'color-box';
+                
+                if (i === correctIndex) {
+                    // Correct label
+                    box.textContent = color1;
+                    box.style.backgroundColor = color1;
+                } else {
+                    // Incorrect label (use a different color name)
+                    const incorrectColor = color1 === color2 ? 
+                        colors.find(c => c !== color1) : color2;
+                    box.textContent = incorrectColor;
+                    box.style.backgroundColor = color1;
+                }
+                
+                box.addEventListener('click', () => handleClick(i));
+                colorOptionsElement.appendChild(box);
+            }
+            
+            // Calculate timer speed based on score
+            currentSpeedMultiplier = Math.min(1 + (score * SPEED_INCREASE_RATE), MAX_SPEED_MULTIPLIER);
+            difficultyElement.textContent = currentSpeedMultiplier.toFixed(1) + 'x';
+            
+            // Start timer with current speed
+            timerInterval = setInterval(updateTimer, BASE_TIMER_SPEED / currentSpeedMultiplier);
+        }
+        
+        function updateTimer() {
+            timerWidth -= 1;
+            timerElement.style.width = `${timerWidth}%`;
+            
+            // Change color as time runs out
+            if (timerWidth < 30) {
+                timerElement.style.backgroundColor = '#f44336';
+            } else if (timerWidth < 60) {
+                timerElement.style.backgroundColor = '#FFC107';
+            }
+            
+            if (timerWidth <= 0) {
+                clearInterval(timerInterval);
+                endGame('Time\'s up! Game over.');
+            }
+        }
+        
+        function handleClick(clickedIndex) {
+            if (!gameActive) return;
+            
+            clearInterval(timerInterval);
+            
+            if (clickedIndex === correctIndex) {
+                // Correct choice
+                score++;
+                scoreElement.textContent = score;
+                messageElement.textContent = '✅ Correct!';
+                messageElement.style.color = 'green';
+                
+                // Brief pause before next round
+                setTimeout(nextRound, 500);
+            } else {
+                // Wrong choice
+                endGame('Wrong choice! Game over.');
+            }
+        }
+        
+        function endGame(message) {
+            gameActive = false;
+            messageElement.textContent = message;
+            messageElement.style.color = 'red';
+            startBtn.style.display = 'inline-block';
+            startBtn.textContent = 'Play Again';
+        }
+    </script>
+</body>
+</html>

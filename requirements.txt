@@ -1,6 +1,0 @@
-python-telegram-bot>=20.0
-requests>=2.25.0
-beautifulsoup4>=4.9.0
-yt-dlp>=2024.1.1
-python-dotenv==0.9.9
-flask
