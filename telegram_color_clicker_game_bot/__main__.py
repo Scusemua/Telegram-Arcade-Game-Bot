@@ -51,16 +51,16 @@ class TelegramBot(object):
         self.telegram_app.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, self.handle_web_app_data))
 
     # Telegram Bot Handlers
-    async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):        
         await update.message.reply_text("Welcome! Type /play to start the game.")
 
-    async def play(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    async def play(self, update: Update, context: ContextTypes.DEFAULT_TYPE):        
         self.logger.info(f'Sending game to chat "{update.effective_chat.id}"')
         await context.bot.send_game(chat_id=update.effective_chat.id, game_short_name=GAME_SHORT_NAME)
     
     async def inline_query(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         results = [
-            InlineQueryResultGame(id=str(uuid4()),game_short_name=GAME_SHORT_NAME)
+            InlineQueryResultGame(id=str(uuid4()), game_short_name=GAME_SHORT_NAME)
         ]
         await update.inline_query.answer(results, cache_time=0)
 
@@ -69,10 +69,9 @@ class TelegramBot(object):
         if query.game_short_name != GAME_SHORT_NAME:
             await query.answer(text="Unknown game.", cache_time=0)
         
-        print("update:", update)
-        print("context:", context)
+        print("game_callback::update:", update)
             
-        url: str = f'{self._game_url}?user_id={0}&chat_id={0}'
+        url: str = f'{self._game_url}?user_id={update.effective_user.id}&chat_id={update.effective_chat.id}'
         await query.answer(text=f"Click to play: {self._game_url}", url=url, cache_time=0)
     
     async def handle_web_app_data(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -108,7 +107,7 @@ class TelegramBot(object):
     
     def run(self):
         # ensure_event_loop()
-        self.logger.info("🤖 Bot is running...")
+        self.logger.info("Bot is running...")
         self.telegram_app.run_polling(allowed_updates=Update.ALL_TYPES) 
 
 # Run Flask + Telegram bot

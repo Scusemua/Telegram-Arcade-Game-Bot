@@ -573,10 +573,10 @@
         }
 
         // POST request
-        const data = { 
-            score: score ,
-            user_id: userId,
-            chat_id: chatId,
+        const data = {
+          score: score,
+          user_id: userId,
+          chat_id: chatId,
         };
 
         fetch("/api/data", {
@@ -588,7 +588,9 @@
         })
           .then((response) => response.json())
           .then((data) => {
-            responseElement.textContent = JSON.stringify(data);
+            if (responseElement) {
+              responseElement.textContent = JSON.stringify(data);
+            }
           })
           .catch((error) => {
             console.error("Error:", error);
