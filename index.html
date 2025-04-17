@@ -65,6 +65,8 @@
         let newHighScore = false;
         let isTelegramWebApp = false;
         let tg = null;
+        let prevColor1 = "";
+        let prevColor2 = "";
         
         const scoreElement = document.getElementById('score');
         const highScoreElement = document.getElementById('highScore');
@@ -236,9 +238,16 @@
             timerElement.style.backgroundColor = '#4CAF50';
             
             // Generate two random colors
-            const shuffledColors = [...colors].sort(() => 0.5 - Math.random());
-            const color1 = shuffledColors[0];
-            const color2 = shuffledColors[1];
+            let shuffledColors = [...colors].sort(() => 0.5 - Math.random());
+            let color1 = shuffledColors[0];
+            let color2 = shuffledColors[1];
+
+            // Don't generate the exact same colors
+            while (color1 == prevColor1 && color2 == prevColor2) {
+                shuffledColors = [...colors].sort(() => 0.5 - Math.random());
+                color1 = shuffledColors[0];
+                color2 = shuffledColors[1];
+            }
             
             // Decide which one will be correct (randomly)
             correctIndex = Math.random() < 0.5 ? 0 : 1;
@@ -270,6 +279,9 @@
             
             // Start timer with current speed
             timerInterval = setInterval(updateTimer, BASE_TIMER_SPEED / currentSpeedMultiplier);
+
+            prevColor1 = color1;
+            prevColor2 = color2;
         }
         
         function updateTimer() {
