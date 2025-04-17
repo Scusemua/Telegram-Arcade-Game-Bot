@@ -21,31 +21,11 @@ from telegram.ext import ApplicationBuilder, Application, InlineQueryHandler
 GAME_SHORT_NAME: str = "color_clicker"
 LOGGER_FORMAT: str = '%(asctime)s | %(levelname)s | %(message)s | %(name)s | %(funcName)s'
 
-app = Flask(__name__)
-
-def ensure_event_loop():
-    try:
-        loop = asyncio.get_running_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-    return loop
-
-@app.route('/api/data', methods=['POST'])
-def handle_data():
-    data = request.json
-    print("Received POST data:", data)
-    return jsonify({"received_data": data, "message": "POST request received"})
-
-@app.route("/game")
-def serve_game():
-    return send_from_directory(".", "game.html")
-
 class TelegramBot(object):
-    def __init__(self, game_url: str = "", token: str = "", run_flask: bool = False):
+    def __init__(self, game_url: str = "", token: str = "", http_port: int = 8082):
         self._token = token
         self._game_url: str = game_url
-        self._run_flask: bool = run_flask
+        self._http_port: int = http_port
 
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.DEBUG)
@@ -88,8 +68,12 @@ class TelegramBot(object):
         query = update.callback_query
         if query.game_short_name != GAME_SHORT_NAME:
             await query.answer(text="Unknown game.", cache_time=0)
-            return
-        await query.answer(text=f"Click to play: {self._game_url}", url=self._game_url, cache_time=0)
+        
+        print("update:", update)
+        print("context:", context)
+            
+        url: str = f'{self._game_url}?user_id={0}&chat_id={0}'
+        await query.answer(text=f"Click to play: {self._game_url}", url=url, cache_time=0)
     
     async def handle_web_app_data(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_id = update.effective_user.id
@@ -106,6 +90,21 @@ class TelegramBot(object):
             message_id=update.message.message_id,
             force=True  # allow overwrite of lower scores
         )
+    
+    def run_http_server(self):
+        app = Flask(__name__)
+
+        @app.route('/api/data', methods=['POST'])
+        def handle_data():
+            data = request.json
+            print("Received POST data:", data)
+            return jsonify({"received_data": data, "message": "POST request received"})
+
+        @app.route("/game")
+        def serve_game():
+            return send_from_directory(".", "game.html")
+    
+        app.run(host="0.0.0.0", port=self._http_port, debug=False, use_reloader=False)
     
     def run(self):
         # ensure_event_loop()
@@ -140,14 +139,11 @@ def main():
     # bot_user_id: str = os.environ.get("BOT_USER_ID", args.bot_user_id)
     game_url:str = os.environ.get("GAME_URL", args.game_url)
     
-    bot: TelegramBot = TelegramBot(game_url=game_url, token=token)
-    
-    def run_http_server():
-        app.run(host="0.0.0.0", port=args.port, debug=False, use_reloader=False)
+    bot: TelegramBot = TelegramBot(game_url=game_url, token=token, http_port=args.port)
     
     if args.run_http_server:
         # Start bot polling in background
-        Thread(target=run_http_server, daemon=True).start()
+        Thread(target=bot.run_http_server, daemon=True).start()
         
     bot.run()
 

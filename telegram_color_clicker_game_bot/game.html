@@ -220,6 +220,17 @@
     </div>
 
     <script>
+      // Get the user ID from the URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const userId = urlParams.get("user_id"); // e.g., "12345"
+      const chatId = urlParams.get("chat_id"); // Optional
+
+      console.log("Telegram User ID:", userId);
+
+      if (chatId) {
+        console.log("Telegram Chat ID:", chatId);
+      }
+
       const colors = [
         "red",
         "blue",
@@ -562,7 +573,11 @@
         }
 
         // POST request
-        const data = { score: score };
+        const data = { 
+            score: score ,
+            user_id: userId,
+            chat_id: chatId,
+        };
 
         fetch("/api/data", {
           method: "POST",
