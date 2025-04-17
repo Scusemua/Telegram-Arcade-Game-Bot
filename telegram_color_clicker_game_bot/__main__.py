@@ -35,10 +35,6 @@ def ensure_event_loop():
 def serve_game():
     return send_from_directory(".", "game.html")
 
-@flask_app.route("/")
-def serve_game():
-    return send_from_directory(".", "game.html")
-
 class TelegramBot(object):
     def __init__(self, game_url: str = "", token: str = "", run_flask: bool = False):
         self._token = token
