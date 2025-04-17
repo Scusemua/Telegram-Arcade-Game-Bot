@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://telegram.org/js/games.js"></script>
     <title>Color Label Game</title>
     <style>
         body {
@@ -96,6 +97,8 @@
         <div class="message" id="message"></div>
         
         <button class="start-btn" id="startBtn">Start Game</button>
+
+        <button onclick="TelegramGameProxy.shareScore()">Share score</button>
     </div>
 
     <script>
