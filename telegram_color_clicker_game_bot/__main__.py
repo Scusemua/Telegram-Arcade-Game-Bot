@@ -70,9 +70,12 @@ class TelegramBot(object):
         if query.game_short_name != GAME_SHORT_NAME:
             await query.answer(text="Unknown game.", cache_time=0)
         
-        print("game_callback::update:", update)
+        self.logger.debug("game_callback::update:", update)
             
         url: str = f'{self._game_url}?user_id={update.effective_user.id}&chat_id={update.effective_chat.id}'
+        
+        self.logger.debug(f'url: "{url}"')
+        
         await query.answer(text=f"Click to play: {self._game_url}", url=url, cache_time=0)
     
     async def handle_web_app_data(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -98,7 +101,7 @@ class TelegramBot(object):
         @app.route('/api/data', methods=['POST'])
         def handle_data():
             data = request.json
-            print("Received POST data:", data)
+            self.logger.debug("Received POST data:", data)
             return jsonify({"received_data": data, "message": "POST request received"})
 
         @app.route("/game")
