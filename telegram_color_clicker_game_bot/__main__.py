@@ -1,6 +1,7 @@
 import json
 import os
 import logging 
+import asyncio
 from uuid import uuid4
 from dotenv import load_dotenv
 from flask import Flask, send_from_directory, request
@@ -21,6 +22,14 @@ GAME_SHORT_NAME: str = "color_clicker"
 LOGGER_FORMAT: str = '%(asctime)s | %(levelname)s | %(message)s | %(name)s | %(funcName)s'
 
 flask_app = Flask(__name__)
+
+def ensure_event_loop():
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+    return loop
 
 @flask_app.route("/game")
 def serve_game():
@@ -93,6 +102,7 @@ class TelegramBot(object):
         )
     
     def run(self):
+        ensure_event_loop()
         self.logger.info("🤖 Bot is running...")
         self.telegram_app.run_polling(allowed_updates=Update.ALL_TYPES) 
 
