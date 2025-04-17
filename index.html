@@ -319,6 +319,10 @@
             messageElement.style.color = 'red';
             startBtn.style.display = 'inline-block';
             startBtn.textContent = 'Play Again';
+
+            Telegram.WebApp.sendData(JSON.stringify({
+                score: finalScore
+            }));
         }
         
         // Initialize the game when page loads
