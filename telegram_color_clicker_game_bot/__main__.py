@@ -101,7 +101,7 @@ class TelegramBot(object):
         @app.route('/api/data', methods=['POST'])
         def handle_data():
             data = request.json
-            self.logger.debug("Received POST data:", data)
+            self.logger.debug(f"Received POST data: {data}")
             return jsonify({"received_data": data, "message": "POST request received"})
 
         @app.route("/game")
