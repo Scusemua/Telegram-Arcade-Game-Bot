@@ -4,7 +4,7 @@ import logging
 import asyncio
 from uuid import uuid4
 from dotenv import load_dotenv
-from flask import Flask, send_from_directory, request
+from flask import Flask, send_from_directory, render_template
 from telegram import InlineQueryResultGame, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, CallbackQueryHandler
 
@@ -30,6 +30,10 @@ def ensure_event_loop():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
     return loop
+
+@app.route("/")
+def index():
+    return render_template("game.html")
 
 @app.route("/game")
 def serve_game():
