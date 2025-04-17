@@ -46,17 +46,18 @@
     <script>
         const colors = [
             'red', 'blue', 'green', 'yellow', 'orange', 
-            'purple', 'pink', 'brown', 'cyan', 'magenta'
+            'purple', 'pink', 'black', 'cyan', 'magenta'
         ];
         
         // Game settings
         const BASE_TIMER_SPEED = 100; // ms between updates (slower = faster timer)
-        const MAX_SPEED_MULTIPLIER = 5; // Maximum speed increase
-        const SPEED_INCREASE_RATE = 0.1; // How much speed increases per point
+        const MAX_SPEED_MULTIPLIER = 10; // Maximum speed increase
+        const SPEED_INCREASE_RATE = 0.25; // How much speed increases per point
         
         let score = 0;
         let highScore = 0;
         let timerWidth = 100;
+        let nextRoundDelay = 500;
         let timerInterval;
         let gameActive = false;
         let correctIndex;
@@ -301,7 +302,7 @@
                 messageElement.style.color = 'green';
                 
                 // Brief pause before next round
-                setTimeout(nextRound, 1000);
+                setTimeout(nextRound, nextRoundDelay);
             } else {
                 // Wrong choice
                 endGame('Wrong choice!');
