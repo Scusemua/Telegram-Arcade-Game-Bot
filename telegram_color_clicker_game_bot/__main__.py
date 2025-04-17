@@ -70,7 +70,7 @@ class TelegramBot(object):
         if query.game_short_name != GAME_SHORT_NAME:
             await query.answer(text="Unknown game.", cache_time=0)
         
-        self.logger.debug("game_callback::update:", update)
+        self.logger.debug(f"game_callback::update: {update}")
             
         url: str = f'{self._game_url}?user_id={update.effective_user.id}&chat_id={update.effective_chat.id}'
         
