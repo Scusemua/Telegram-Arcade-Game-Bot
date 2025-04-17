@@ -320,7 +320,7 @@
             startBtn.style.display = 'inline-block';
             startBtn.textContent = 'Play Again';
 
-            Telegram.WebApp.sendData(JSON.stringify({
+            tg.sendData(JSON.stringify({
                 score: finalScore
             }));
         }
