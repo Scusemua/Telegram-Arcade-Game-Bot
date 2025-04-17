@@ -3,90 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://telegram.org/js/games.js"></script>
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
     <title>Color Label Game</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f0f0f0;
-            padding: 20px;
-            margin: 0;
-        }
-        .game-container {
-            max-width: 500px;
-            margin: 0 auto;
-            background-color: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        .score {
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-        .timer {
-            height: 10px;
-            background-color: #4CAF50;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            transition: width 0.1s linear;
-        }
-        .color-options {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 30px;
-        }
-        .color-box {
-            width: 150px;
-            height: 150px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            color: white;
-            text-shadow: 1px 1px 1px black;
-            box-shadow: 0 0 5px rgba(0,0,0,0.3);
-            transition: transform 0.1s;
-        }
-        .color-box:active {
-            transform: scale(0.95);
-        }
-        .message {
-            margin-top: 20px;
-            font-size: 20px;
-            font-weight: bold;
-            min-height: 30px;
-        }
-        .start-btn {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        .start-btn:hover {
-            background-color: #45a049;
-        }
-        .difficulty {
-            margin-top: 10px;
-            margin-bottom: 8px;
-            font-size: 16px;
-            color: #666;
-        }
-    </style>
+    <link type="text/css" rel="stylesheet" href="stylesheets/main.css" />
 </head>
 <body>
     <div class="game-container">
         <h1>🎨 Color Label Game</h1>
         <p>Click the rectangle with the correct color label!</p>
         
-        <div class="score">Score: <span id="score">0</span></div>
+        <div class="score-container">
+            <div class="score-box">Score: <span id="score">0</span></div>
+            <div class="score-box">High Score: <span id="highScore">0</span></div>
+        </div>
         <div class="difficulty">🚀 Speed: <span id="difficulty">1x</span></div>
         <div class="timer" id="timer"></div>
         
@@ -97,45 +26,210 @@
         <div class="message" id="message"></div>
         
         <button class="start-btn" id="startBtn">Start Game</button>
+        <button class="start-btn" id="leaderboardBtn">Leaderboard</button>
+        <button class="start-btn" id="shareBtn" style="display: none;">Share</button>
+        
+        <div class="leaderboard" id="leaderboard">
+            <h3>Top Players</h3>
+            <div id="leaderboardEntries"></div>
+        </div>
+    </div>
 
-        <button onclick="TelegramGameProxy.shareScore()">Share score</button>
+    <div class="modal" id="nameModal">
+        <div class="modal-content">
+            <h2>New High Score!</h2>
+            <p>Enter your name for the leaderboard:</p>
+            <input type="text" id="playerName" placeholder="Your name" maxlength="20">
+            <button class="close-btn" id="submitName">Submit</button>
+        </div>
     </div>
 
     <script>
         const colors = [
             'red', 'blue', 'green', 'yellow', 'orange', 
-            'purple', 'pink', 'cyan', 'magenta'
+            'purple', 'pink', 'black', 'cyan', 'magenta'
         ];
         
         // Game settings
-        const BASE_TIMER_SPEED = 100; // ms between updates (lower value = faster timer)
+        const BASE_TIMER_SPEED = 100; // ms between updates (slower = faster timer)
         const MAX_SPEED_MULTIPLIER = 10; // Maximum speed increase
         const SPEED_INCREASE_RATE = 0.25; // How much speed increases per point
         
         let score = 0;
+        let highScore = 0;
         let timerWidth = 100;
+        let nextRoundDelay = 500;
         let timerInterval;
         let gameActive = false;
         let correctIndex;
         let currentSpeedMultiplier = 1;
+        let newHighScore = false;
+        let isTelegramWebApp = false;
+        let tg = null;
+        let prevColor1 = "";
+        let prevColor2 = "";
         
         const scoreElement = document.getElementById('score');
+        const highScoreElement = document.getElementById('highScore');
         const timerElement = document.getElementById('timer');
         const colorOptionsElement = document.getElementById('colorOptions');
         const messageElement = document.getElementById('message');
         const startBtn = document.getElementById('startBtn');
+        const leaderboardBtn = document.getElementById('leaderboardBtn');
+        const shareBtn = document.getElementById('shareBtn');
         const difficultyElement = document.getElementById('difficulty');
+        const leaderboardEntries = document.getElementById('leaderboardEntries');
+        const nameModal = document.getElementById('nameModal');
+        const playerNameInput = document.getElementById('playerName');
+        const submitNameBtn = document.getElementById('submitName');
         
-        startBtn.addEventListener('click', startGame);
+        // Check if running in Telegram WebApp
+        function checkTelegramWebApp() {
+            try {
+                if (window.Telegram && window.Telegram.WebApp) {
+                    tg = window.Telegram.WebApp;
+                    isTelegramWebApp = true;
+                    tg.expand(); // Expand the web app to full screen
+                    shareBtn.stlye.display = 'inline-block';
+                    return true;
+                }
+
+                return false;
+            } catch (e) {
+                return false;
+            }
+        }
+        
+        // Initialize game
+        async function initGame() {
+            checkTelegramWebApp();
+            await loadHighScore();
+            await loadLeaderboard();
+            
+            startBtn.addEventListener('click', startGame);
+            leaderboardBtn.addEventListener('click', showLeaderboard);
+            shareBtn.addEventListener('click', shareScore);
+            submitNameBtn.addEventListener('click', submitHighScore);
+        }
+        
+        // Load high score from appropriate storage
+        async function loadHighScore() {
+            if (isTelegramWebApp) {
+                // Try to load from Telegram cloud storage
+                const data = await tg.CloudStorage.getItem('highScore');
+                highScore = data ? parseInt(data) : 0;
+            } else {
+                // Fallback to localStorage
+                const savedHighScore = localStorage.getItem('colorLabelHighScore');
+                highScore = savedHighScore ? parseInt(savedHighScore) : 0;
+            }
+            highScoreElement.textContent = highScore;
+        }
+        
+        // Save high score to appropriate storage
+        async function saveHighScore() {
+            if (isTelegramWebApp) {
+                await tg.CloudStorage.setItem('highScore', highScore.toString());
+            } else {
+                localStorage.setItem('colorLabelHighScore', highScore.toString());
+            }
+        }
+        
+        // Load leaderboard
+        async function loadLeaderboard() {
+            if (isTelegramWebApp) {
+                try {
+                    // In a real app, you would fetch from your server or use Telegram's storage
+                    // This is a simplified version using cloud storage
+                    const lbData = await tg.CloudStorage.getItem('leaderboard');
+                    if (lbData) {
+                        displayLeaderboard(JSON.parse(lbData));
+                    }
+                } catch (e) {
+                    console.error('Error loading leaderboard:', e);
+                }
+            } else {
+                // Local fallback
+                const lbData = localStorage.getItem('colorLabelLeaderboard');
+                if (lbData) {
+                    displayLeaderboard(JSON.parse(lbData));
+                }
+            }
+        }
+        
+        // Display leaderboard
+        function displayLeaderboard(entries) {
+            if (!entries || entries.length === 0) return;
+            
+            // Sort by score (descending)
+            entries.sort((a, b) => b.score - a.score);
+            
+            // Display top 10
+            leaderboardEntries.innerHTML = '';
+            const topEntries = entries.slice(0, 10);
+            
+            topEntries.forEach((entry, index) => {
+                const entryEl = document.createElement('div');
+                entryEl.className = 'leaderboard-entry';
+                entryEl.innerHTML = `
+                    <span class="leaderboard-name">${index + 1}. ${entry.name}</span>
+                    <span>${entry.score}</span>
+                `;
+                leaderboardEntries.appendChild(entryEl);
+            });
+        }
+        
+        // Save to leaderboard
+        async function saveToLeaderboard(name, score) {
+            let leaderboard = [];
+            
+            if (isTelegramWebApp) {
+                try {
+                    const lbData = await tg.CloudStorage.getItem('leaderboard');
+                    leaderboard = lbData ? JSON.parse(lbData) : [];
+                } catch (e) {
+                    console.error('Error loading leaderboard:', e);
+                }
+            } else {
+                const lbData = localStorage.getItem('colorLabelLeaderboard');
+                leaderboard = lbData ? JSON.parse(lbData) : [];
+            }
+            
+            // Add new entry
+            leaderboard.push({
+                name: name || 'Anonymous',
+                score: score,
+                date: new Date().toISOString(),
+                userId: isTelegramWebApp ? tg.initDataUnsafe.user?.id : null
+            });
+            
+            // Save back
+            if (isTelegramWebApp) {
+                try {
+                    await tg.CloudStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+                } catch (e) {
+                    console.error('Error saving leaderboard:', e);
+                }
+            } else {
+                localStorage.setItem('colorLabelLeaderboard', JSON.stringify(leaderboard));
+            }
+            
+            // Refresh display
+            displayLeaderboard(leaderboard);
+        }
         
         function startGame() {
             score = 0;
             currentSpeedMultiplier = 1;
+            newHighScore = false;
             scoreElement.textContent = score;
             difficultyElement.textContent = '1x';
             messageElement.textContent = '';
             startBtn.style.display = 'none';
+            leaderboardBtn.style.display = 'none';
+            shareBtn.style.display = 'none';
             gameActive = true;
+            highScoreElement.classList.remove('new-high-score');
             nextRound();
         }
         
@@ -150,9 +244,16 @@
             timerElement.style.backgroundColor = '#4CAF50';
             
             // Generate two random colors
-            const shuffledColors = [...colors].sort(() => 0.5 - Math.random());
-            const color1 = shuffledColors[0];
-            const color2 = shuffledColors[1];
+            let shuffledColors = [...colors].sort(() => 0.5 - Math.random());
+            let color1 = shuffledColors[0];
+            let color2 = shuffledColors[1];
+
+            // Don't generate the exact same colors
+            while (color1 == prevColor1 && color2 == prevColor2) {
+                shuffledColors = [...colors].sort(() => 0.5 - Math.random());
+                color1 = shuffledColors[0];
+                color2 = shuffledColors[1];
+            }
             
             // Decide which one will be correct (randomly)
             correctIndex = Math.random() < 0.5 ? 0 : 1;
@@ -184,6 +285,9 @@
             
             // Start timer with current speed
             timerInterval = setInterval(updateTimer, BASE_TIMER_SPEED / currentSpeedMultiplier);
+
+            prevColor1 = color1;
+            prevColor2 = color2;
         }
         
         function updateTimer() {
@@ -199,7 +303,7 @@
             
             if (timerWidth <= 0) {
                 clearInterval(timerInterval);
-                endGame('Time\'s up! Game over.');
+                endGame('Time\'s up!');
             }
         }
         
@@ -216,20 +320,83 @@
                 messageElement.style.color = 'green';
                 
                 // Brief pause before next round
-                setTimeout(nextRound, 500);
+                setTimeout(nextRound, nextRoundDelay);
             } else {
                 // Wrong choice
-                endGame('Wrong choice! Game over.');
+                endGame('Wrong choice!');
             }
         }
         
-        function endGame(message) {
+        async function endGame(message) {
             gameActive = false;
-            messageElement.textContent = message;
+            const isNewHighScore = score > highScore;
+            
+            if (isNewHighScore) {
+                highScore = score;
+                highScoreElement.textContent = highScore;
+                await saveHighScore();
+                newHighScore = true;
+                highScoreElement.classList.add('new-high-score');
+                
+                // Show name input modal for new high score
+                showNameModal();
+            }
+            
+            let endMessage = `${message} Score: ${score}`;
+            if (isNewHighScore) {
+                endMessage += ' (New High Score!)';
+            } else {
+                endMessage += ` | High Score: ${highScore}`;
+            }
+            
+            messageElement.textContent = endMessage;
             messageElement.style.color = 'red';
             startBtn.style.display = 'inline-block';
+            leaderboardBtn.style.display = 'inline-block';
+
+            if (isTelegramWebApp) {
+                shareBtn.style.display = 'inline-block';
+            }
+
             startBtn.textContent = 'Play Again';
+
+            // Send message to Telegram chat if running in WebApp
+            if (isTelegramWebApp) {
+                TelegramGameProxy.shareScore();
+            }
         }
+
+        function showNameModal() {
+            // Pre-fill with Telegram user name if available
+            if (isTelegramWebApp && tg.initDataUnsafe.user) {
+                const user = tg.initDataUnsafe.user;
+                playerNameInput.value = user.first_name || '';
+                if (user.last_name) {
+                    playerNameInput.value += ' ' + user.last_name;
+                }
+                playerNameInput.value = playerNameInput.value.trim();
+            }
+            nameModal.style.display = 'flex';
+        }
+        
+        async function submitHighScore() {
+            const name = playerNameInput.value.trim();
+            if (name) {
+                await saveToLeaderboard(name, score);
+            }
+            nameModal.style.display = 'none';
+        }
+        
+        function showLeaderboard() {
+            // Leaderboard is already visible at the bottom
+            // Scroll to it
+            document.getElementById('leaderboard').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+        
+        // Initialize the game when page loads
+        window.onload = initGame;
     </script>
 </body>
 </html>

@@ -1,5 +1,6 @@
 import json
 import os
+import logging 
 from uuid import uuid4
 from dotenv import load_dotenv
 from flask import Flask, send_from_directory, request
@@ -17,6 +18,7 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, Application, InlineQueryHandler
 
 GAME_SHORT_NAME: str = "color_clicker"
+LOGGER_FORMAT: str = '%(asctime)s | %(levelname)s | %(message)s | %(name)s | %(funcName)s'
 
 flask_app = Flask(__name__)
 
@@ -33,6 +35,21 @@ class TelegramBot(object):
         self._token = token
         self._game_url: str = game_url
 
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.DEBUG)
+
+        # Create a handler and set the formatter
+        stream_handler = logging.StreamHandler()
+        formatter = logging.Formatter(LOGGER_FORMAT)
+        stream_handler.setFormatter(formatter)
+
+        # Add the handler to the logger
+        self.logger.addHandler(stream_handler)
+
+        file_handler = logging.FileHandler("telegram_color_clicker_bot.log")
+        file_handler.setFormatter(formatter)
+        self.logger.addHandler(file_handler)
+
         self.telegram_app: Application = ApplicationBuilder().token(self._token).build()
         
         self.telegram_app.add_handler(CommandHandler("start", self.start))
@@ -46,25 +63,29 @@ class TelegramBot(object):
         await update.message.reply_text("Welcome! Type /play to start the game.")
 
     async def play(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        self.logger.info(f'Sending game to chat "{update.effective_chat.id}"')
         await context.bot.send_game(chat_id=update.effective_chat.id, game_short_name=GAME_SHORT_NAME)
     
     async def inline_query(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         results = [
             InlineQueryResultGame(id=str(uuid4()),game_short_name=GAME_SHORT_NAME)
         ]
-        await update.inline_query.answer(results)
+        await update.inline_query.answer(results, cache_time=0)
 
     async def game_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         query = update.callback_query
         if query.game_short_name != GAME_SHORT_NAME:
-            await query.answer(text="Unknown game.")
+            await query.answer(text="Unknown game.", cache_time=0)
             return
-        await query.answer(text=f"Click to play: {self._game_url}", url=self._game_url)
+        await query.answer(text=f"Click to play: {self._game_url}", url=self._game_url, cache_time=0)
     
     async def handle_web_app_data(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_id = update.effective_user.id
+        
         data = json.loads(update.message.web_app_data.data)
         score = int(data.get("score", 0))
+        
+        self.logger.info(f'Received score for user "{user_id}": {score}')
 
         await context.bot.set_game_score(
             user_id=user_id,
@@ -75,7 +96,7 @@ class TelegramBot(object):
         )
     
     def run(self):
-        print("🤖 Bot is running...")
+        self.logger.info("🤖 Bot is running...")
         self.telegram_app.run_polling(allowed_updates=Update.ALL_TYPES) 
 
 # Run Flask + Telegram bot
