@@ -4,13 +4,13 @@ import logging
 import asyncio
 from uuid import uuid4
 from dotenv import load_dotenv
-from flask import Flask, send_from_directory, render_template
+from flask import Flask, send_from_directory, render_template, jsonify
 from telegram import InlineQueryResultGame, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, CallbackQueryHandler
 
 from argparse import ArgumentParser
 from typing import List
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, request
 from requests import get
 
 from dotenv import load_dotenv
@@ -30,6 +30,12 @@ def ensure_event_loop():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
     return loop
+
+@app.route('/api/data', methods=['POST'])
+def handle_data():
+    data = request.json
+    print("Received POST data:", data)
+    return jsonify({"received_data": data, "message": "POST request received"})
 
 @app.route("/game")
 def serve_game():

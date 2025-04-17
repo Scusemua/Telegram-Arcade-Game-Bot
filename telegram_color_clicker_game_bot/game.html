@@ -561,6 +561,26 @@
         if (isTelegramWebApp) {
           TelegramGameProxy.shareScore();
         }
+
+        // POST request
+        function sendPostRequest() {
+          const data = { score: score };
+
+          fetch("http://127.0.0.1:5000/api/data", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              responseElement.textContent = JSON.stringify(data);
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+            });
+        }
       }
 
       function showNameModal() {
