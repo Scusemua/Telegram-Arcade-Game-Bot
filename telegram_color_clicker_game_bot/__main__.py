@@ -102,7 +102,7 @@ class TelegramBot(object):
         )
     
     def run(self):
-        ensure_event_loop()
+        # ensure_event_loop()
         self.logger.info("🤖 Bot is running...")
         self.telegram_app.run_polling(allowed_updates=Update.ALL_TYPES) 
 
@@ -136,14 +136,14 @@ def main():
     
     bot: TelegramBot = TelegramBot(game_url=game_url, token=token)
     
+    def run_http_server():
+        flask_app.run(host="0.0.0.0", port=args.port)
+    
     if args.run_http_server:
         # Start bot polling in background
-        Thread(target=bot.run, daemon=True).start()
-
-        # Start Flask server
-        flask_app.run(host="0.0.0.0", port=args.port)
-    else:
-        bot.run()
+        Thread(target=run_http_server, daemon=True).start()
+        
+    bot.run()
 
 if __name__ == "__main__":
     main()
