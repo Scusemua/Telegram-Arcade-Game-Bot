@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://telegram.org/js/games.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <title>Color Label Game</title>
     <style>
         body {
@@ -21,9 +21,13 @@
             padding: 20px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-        .score {
-            font-size: 24px;
+        .score-container {
+            display: flex;
+            justify-content: space-around;
             margin-bottom: 20px;
+        }
+        .score-box {
+            font-size: 24px;
         }
         .timer {
             height: 10px;
@@ -75,19 +79,35 @@
         }
         .difficulty {
             margin-top: 10px;
-            margin-bottom: 8px;
-            font-size: 16px;
+            font-size: 14px;
             color: #666;
+        }
+        .new-high-score {
+            animation: pulse 0.5s infinite alternate;
+            color: #FFD700;
+            font-weight: bold;
+        }
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
         }
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <h1>🎨 Color Label Game</h1>
+    <div id="start-screen" style="display: block;">
+        <h2 id="welcome">Welcome!</h2>
+        <button id="start-screen-start-button">Start Game</button>
+      </div>
+
+    <div id="game-screen" class="game-container" style="display: none;">
+        <h1>Color Label Game</h1>
         <p>Click the rectangle with the correct color label!</p>
         
-        <div class="score">Score: <span id="score">0</span></div>
-        <div class="difficulty">🚀 Speed: <span id="difficulty">1x</span></div>
+        <div class="score-container">
+            <div class="score-box">Score: <span id="score">0</span></div>
+            <div class="score-box">High Score: <span id="highScore">0</span></div>
+        </div>
+        <div class="difficulty">Speed: <span id="difficulty">1x</span></div>
         <div class="timer" id="timer"></div>
         
         <div class="color-options" id="colorOptions">
@@ -97,45 +117,106 @@
         <div class="message" id="message"></div>
         
         <button class="start-btn" id="startBtn">Start Game</button>
-
-        <button onclick="TelegramGameProxy.shareScore()">Share score</button>
     </div>
 
     <script>
         const colors = [
             'red', 'blue', 'green', 'yellow', 'orange', 
-            'purple', 'pink', 'cyan', 'magenta'
+            'purple', 'pink', 'black', 'cyan', 'magenta'
         ];
+
+        const tg = window.Telegram.WebApp;
+        tg.expand();  // makes the view full screen
+
+        const user = tg.initDataUnsafe.user;
+
+        if (user) {
+            document.getElementById("welcome").innerText = `Welcome, ${user.first_name || 'Player'}!`;
+        }
         
         // Game settings
-        const BASE_TIMER_SPEED = 100; // ms between updates (lower value = faster timer)
+        const BASE_TIMER_SPEED = 100; // ms between updates (slower = faster timer)
         const MAX_SPEED_MULTIPLIER = 10; // Maximum speed increase
         const SPEED_INCREASE_RATE = 0.25; // How much speed increases per point
         
         let score = 0;
+        let highScore = 0;
         let timerWidth = 100;
         let timerInterval;
         let gameActive = false;
         let correctIndex;
         let currentSpeedMultiplier = 1;
+        let newHighScore = false;
         
         const scoreElement = document.getElementById('score');
+        const highScoreElement = document.getElementById('highScore');
         const timerElement = document.getElementById('timer');
         const colorOptionsElement = document.getElementById('colorOptions');
         const messageElement = document.getElementById('message');
         const startBtn = document.getElementById('startBtn');
         const difficultyElement = document.getElementById('difficulty');
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const startScreenStartButton = document.getElementById('start-screen-start-button');
+
+        startScreenStartButton.addEventListener('click', startScreenStartGame);
         
-        startBtn.addEventListener('click', startGame);
+        // Load high score from localStorage
+        function loadHighScore() {
+            const savedHighScore = localStorage.getItem('colorLabelHighScore');
+            highScore = savedHighScore ? parseInt(savedHighScore) : 0;
+            highScoreElement.textContent = highScore;
+        }
         
-        function startGame() {
+        // Save high score to localStorage
+        function saveHighScore() {
+            localStorage.setItem('colorLabelHighScore', highScore.toString());
+        }
+        
+        // Check if current score is a new high score
+        function checkHighScore() {
+            if (score > highScore) {
+                highScore = score;
+                highScoreElement.textContent = highScore;
+                saveHighScore();
+                newHighScore = true;
+                highScoreElement.classList.add('new-high-score');
+            }
+        }
+        
+        // Initialize game
+        function initGame() {
+            loadHighScore();
+            startBtn.addEventListener('click', startGame);
+            startScreenStartButton.addEventListener('click', startScreenStartGame);
+        }
+
+        function startScreenStartGame() {
+            gameScreen.style.display = "block";
+            startScreen.style.display = "none";
+
             score = 0;
             currentSpeedMultiplier = 1;
+            newHighScore = false;
+            scoreElement.textContent = score;
+            difficultyElement.textContent = '1x';
+            messageElement.textContent = '';
+            gameActive = false;
+        }
+        
+        function startGame() {
+            startScreen.style.display = "none";
+            gameScreen.style.display = "block";
+
+            score = 0;
+            currentSpeedMultiplier = 1;
+            newHighScore = false;
             scoreElement.textContent = score;
             difficultyElement.textContent = '1x';
             messageElement.textContent = '';
             startBtn.style.display = 'none';
             gameActive = true;
+            highScoreElement.classList.remove('new-high-score');
             nextRound();
         }
         
@@ -199,7 +280,7 @@
             
             if (timerWidth <= 0) {
                 clearInterval(timerInterval);
-                endGame('Time\'s up! Game over.');
+                endGame('Time\'s up!');
             }
         }
         
@@ -212,24 +293,36 @@
                 // Correct choice
                 score++;
                 scoreElement.textContent = score;
-                messageElement.textContent = '✅ Correct!';
+                messageElement.textContent = 'Correct!';
                 messageElement.style.color = 'green';
                 
                 // Brief pause before next round
-                setTimeout(nextRound, 500);
+                setTimeout(nextRound, 1000);
             } else {
                 // Wrong choice
-                endGame('Wrong choice! Game over.');
+                endGame('Wrong choice!');
             }
         }
         
         function endGame(message) {
             gameActive = false;
-            messageElement.textContent = message;
+            checkHighScore();
+            
+            let endMessage = `${message} Score: ${score}`;
+            if (newHighScore) {
+                endMessage += ' (New High Score!)';
+            } else {
+                endMessage += ` | High Score: ${highScore}`;
+            }
+            
+            messageElement.textContent = endMessage;
             messageElement.style.color = 'red';
             startBtn.style.display = 'inline-block';
             startBtn.textContent = 'Play Again';
         }
+        
+        // Initialize the game when page loads
+        window.onload = initGame;
     </script>
 </body>
 </html>
