@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 
 from telegram import Update
 from telegram.ext import ApplicationBuilder, Application, InlineQueryHandler
+from flask_cors import CORS
 
 GAME_SHORT_NAME: str = "color_clicker"
 LOGGER_FORMAT: str = '%(asctime)s | %(levelname)s | %(message)s | %(name)s | %(funcName)s'
@@ -92,6 +93,7 @@ class TelegramBot(object):
     
     def run_http_server(self):
         app = Flask(__name__)
+        CORS(app)  # Allow all origins
 
         @app.route('/api/data', methods=['POST'])
         def handle_data():
