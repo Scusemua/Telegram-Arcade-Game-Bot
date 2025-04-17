@@ -26,7 +26,8 @@
         <div class="message" id="message"></div>
         
         <button class="start-btn" id="startBtn">Start Game</button>
-        <button class="start-btn" id="leaderboardBtn" style="background-color: #2196F3; margin-left: 10px;">Leaderboard</button>
+        <button class="start-btn" id="leaderboardBtn">Leaderboard</button>
+        <button class="start-btn" id="shareBtn" style="display: none;">Share</button>
         
         <div class="leaderboard" id="leaderboard">
             <h3>Top Players</h3>
@@ -75,6 +76,7 @@
         const messageElement = document.getElementById('message');
         const startBtn = document.getElementById('startBtn');
         const leaderboardBtn = document.getElementById('leaderboardBtn');
+        const shareBtn = document.getElementById('shareBtn');
         const difficultyElement = document.getElementById('difficulty');
         const leaderboardEntries = document.getElementById('leaderboardEntries');
         const nameModal = document.getElementById('nameModal');
@@ -88,8 +90,10 @@
                     tg = window.Telegram.WebApp;
                     isTelegramWebApp = true;
                     tg.expand(); // Expand the web app to full screen
+                    shareBtn.stlye.display = 'inline-block';
                     return true;
                 }
+
                 return false;
             } catch (e) {
                 return false;
@@ -104,6 +108,7 @@
             
             startBtn.addEventListener('click', startGame);
             leaderboardBtn.addEventListener('click', showLeaderboard);
+            shareBtn.addEventListener('click', shareScore);
             submitNameBtn.addEventListener('click', submitHighScore);
         }
         
@@ -222,6 +227,7 @@
             messageElement.textContent = '';
             startBtn.style.display = 'none';
             leaderboardBtn.style.display = 'none';
+            shareBtn.style.display = 'none';
             gameActive = true;
             highScoreElement.classList.remove('new-high-score');
             nextRound();
@@ -347,9 +353,19 @@
             messageElement.style.color = 'red';
             startBtn.style.display = 'inline-block';
             leaderboardBtn.style.display = 'inline-block';
+
+            if (isTelegramWebApp) {
+                shareBtn.style.display = 'inline-block';
+            }
+
             startBtn.textContent = 'Play Again';
+
+            // Send message to Telegram chat if running in WebApp
+            if (isTelegramWebApp) {
+                TelegramGameProxy.shareScore();
+            }
         }
-        
+
         function showNameModal() {
             // Pre-fill with Telegram user name if available
             if (isTelegramWebApp && tg.initDataUnsafe.user) {
