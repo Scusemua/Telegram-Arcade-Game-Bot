@@ -1,3 +1,4 @@
+import json
 import os
 from uuid import uuid4
 from dotenv import load_dotenv
@@ -38,6 +39,7 @@ class TelegramBot(object):
         self.telegram_app.add_handler(CommandHandler("play", self.play))
         self.telegram_app.add_handler(InlineQueryHandler(self.inline_query))
         self.telegram_app.add_handler(CallbackQueryHandler(self.game_callback))
+        self.telegram_app.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, self.handle_web_app_data))
 
     # Telegram Bot Handlers
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -58,6 +60,19 @@ class TelegramBot(object):
             await query.answer(text="Unknown game.")
             return
         await query.answer(text=f"Click to play: {self._game_url}", url=self._game_url)
+    
+    async def handle_web_app_data(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        user_id = update.effective_user.id
+        data = json.loads(update.message.web_app_data.data)
+        score = int(data.get("score", 0))
+
+        await context.bot.set_game_score(
+            user_id=user_id,
+            score=score,
+            chat_id=update.message.chat.id,
+            message_id=update.message.message_id,
+            force=True  # allow overwrite of lower scores
+        )
     
     def run(self):
         print("🤖 Bot is running...")
