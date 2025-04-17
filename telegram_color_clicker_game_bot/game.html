@@ -285,8 +285,8 @@
       const userIdSpan = document.getElementById("userId");
       const chatIdSpan = document.getElementById("chatId");
 
-      userIdSpan.textContent=userId;
-      chatIdSpan.textContent=chatId;
+      userIdSpan.textContent="UserID: " + userId.toString();
+      chatIdSpan.textContent="ChatID: " + chatId.toString();
 
       // Check if running in Telegram WebApp
       function checkTelegramWebApp() {
