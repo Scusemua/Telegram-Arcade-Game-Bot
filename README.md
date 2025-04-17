@@ -2,6 +2,8 @@
 
 A simple Telegram-compatible HTML5 game where users must quickly click the rectangle that is correctly labeled with its color. Built using Python, Flask, and the Telegram Bot API.
 
+Try the game in your web browser [here](https://scusemua.github.io/Telegram-Color-Clicker-Game-Bot/).
+
 ---
 
 ## 🧠 Gameplay
