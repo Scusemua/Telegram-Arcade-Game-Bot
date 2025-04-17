@@ -2,6 +2,7 @@ import json
 import os
 import logging 
 import asyncio
+import requests
 from uuid import uuid4
 from dotenv import load_dotenv
 from flask import Flask, send_from_directory, render_template, jsonify
@@ -102,7 +103,28 @@ class TelegramBot(object):
         def handle_data():
             data = request.json
             self.logger.debug(f"Received POST data: {data}")
-            return jsonify({"received_data": data, "message": "POST request received"})
+            
+            user_id = data['user_id']
+            chat_id = data.get('chat_id', "")
+            score = data['score']
+
+            json={
+                "user_id": user_id,
+                "score": score,
+                "force": True,  # Override previous score
+            }
+            
+            if chat_id != "":
+                json['chat_id'] = chat_id
+
+            # Call Telegram API
+            response = requests.post(
+                f"https://api.telegram.org/bot{self._token}/setGameScore",
+                json,
+            )
+            
+            self.logger.debug(f'Response from Telegram: {response}')
+            return jsonify(response.json())
 
         @app.route("/game")
         def serve_game():
