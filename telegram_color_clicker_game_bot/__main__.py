@@ -31,13 +31,9 @@ def ensure_event_loop():
         asyncio.set_event_loop(loop)
     return loop
 
-@app.route("/")
-def index():
-    return render_template("game.html")
-
 @app.route("/game")
 def serve_game():
-    return send_from_directory(".", "game.html")
+    return send_from_directory("../", "game.html")
 
 class TelegramBot(object):
     def __init__(self, game_url: str = "", token: str = "", run_flask: bool = False):
