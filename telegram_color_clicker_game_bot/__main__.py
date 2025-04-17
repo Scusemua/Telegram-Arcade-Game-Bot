@@ -143,6 +143,8 @@ def main():
     # bot_user_id: str = os.environ.get("BOT_USER_ID", args.bot_user_id)
     game_url:str = os.environ.get("GAME_URL", args.game_url)
     
+    print(f'Game URL: "{game_url}"')
+    
     bot: TelegramBot = TelegramBot(game_url=game_url, token=token, http_port=args.port)
     
     if args.run_http_server:
