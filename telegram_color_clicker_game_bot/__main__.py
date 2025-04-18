@@ -75,17 +75,17 @@ class TelegramBot(object):
 
         self.logger.debug(f"game_callback::update: {update}")
         
-        try:
+        if callback_query.message:
             chat_id = callback_query.message.chat.id  # Group chat ID
             self.logger.debug(f'Set chat ID to callback_query.message.chat.id ("{chat_id}")')
-        except AttributeError:
+        else:
             chat_id = update.effective_chat.id
             self.logger.debug(f'Set chat ID to update.effective_chat.id ("{chat_id}")')
         
-        try:
+        if callback_query.from_user:
             user_id = callback_query.from_user.id     # User who clicked "Play" # 
             self.logger.debug(f'Set user ID to callback_query.from_user.id ("{user_id}")')
-        except AttributeError:
+        else:
             user_id = update.effective_user.id
             self.logger.debug(f'Set user ID to update.effective_user.id ("{user_id}")')
 
