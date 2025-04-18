@@ -187,6 +187,12 @@
         display: block;
       }
 
+      .difficulty {
+        font-size: 18px;
+        margin-bottom: 20px;
+        color: #666;
+      }
+
       .timer {
         font-size: 18px;
         margin-bottom: 20px;
@@ -214,10 +220,14 @@
   </head>
   <body>
     <div class="container">
-      <h1>24 Puzzle Game</h1>
-      <p class="subtitle">Use all four numbers with +, -, ×, ÷ to make 24</p>
+      <h1>24 Challenge</h1>
+      <p class="subtitle">Use all four numbers with ➕, ➖, ✖️, ➗ to make 24.</p>
 
-      <div class="timer">Time: <span id="time">00:00</span></div>
+      <div class="difficulty">
+        <b>Difficulty:</b> <span id="difficulty"></span>
+      </div>
+
+      <div class="timer"><b>Time:</b> <span id="time">00:00</span></div>
 
       <div class="cards">
         <div class="card" data-number="">?</div>
@@ -259,9 +269,206 @@
         let startTime = null;
         let timerInterval = null;
 
-        const easy_problems = [[2,2,8,6],[2,2,8,6],[2,2,8,6],[2,2,4,5],[4,2,8,4],[8,1,8,7],[5,4,4,8],[8,8,4,9],[4,4,8,8],[1,1,6,5],[5,4,7,3],[7,6,5,6],[5,1,9,2],[6,4,7,7],[3,9,2,5],[8,3,6,4],[8,3,4,3],[4,8,1,8],[8,8,5,1],[3,7,7,7],[9,7,8,1],[2,4,1,4],[6,6,6,6],[9,2,1,8],[4,3,2,1],[3,6,3,2],[3,4,2,6],[8,2,1,5],[5,1,5,4],[6,2,1,7],[4,8,5,7],[9,6,8,1],[3,9,6,6],[8,2,8,4],[5,7,5,7],[6,8,6,4],[1,8,5,7],[1,6,8,8],[3,4,1,3],[7,1,1,4],[1,2,2,7],[6,1,5,2],[1,2,1,9],[7,3,8,8],[5,4,5,3],[8,1,1,4],[3,3,5,6],[2,2,4,6]];
-        const medium_problems = [[2,6,1,6],[5,5,1,9],[2,2,7,6],[3,6,1,6],[2,2,4,7],[4,5,8,6],[3,3,4,5],[5,1,7,4],[7,8,8,9],[2,7,6,8],[3,8,8,9],[6,5,6,8],[2,1,4,9],[6,4,4,2],[6,1,1,9],[3,2,7,4],[5,8,4,9],[4,7,2,6],[6,7,1,9],[7,3,1,3],[8,1,2,7],[2,9,5,5],[6,2,2,5],[5,6,9,1],[4,4,1,8],[9,4,4,1],[2,3,3,8],[5,6,4,9],[3,2,2,6],[2,8,2,9],[6,3,7,5],[5,4,3,9],[5,4,4,3],[3,6,6,2],[4,2,3,4],[1,6,5,3],[5,7,7,6],[4,3,4,7],[3,6,5,2],[8,6,6,2],[2,8,8,7],[5,4,4,6],[3,1,7,2],[1,3,8,5],[8,7,4,8],[7,2,2,8],[5,8,2,6],[1,4,3,7],[7,8,6,5],[4,3,2,5],[6,2,4,9],[4,7,2,4],[2,8,8,9],[3,2,5,8],[8,7,7,2],[3,7,7,2],[4,2,2,8],[8,4,2,9],[4,7,7,1],[7,7,2,5],[4,7,7,5],[5,4,3,6],[3,2,1,6],[6,2,1,9],[7,4,1,9],[6,5,3,8],[8,3,2,4],[7,5,1,9],[5,3,3,9],[5,3,1,7],[6,3,2,9],[6,6,3,8],[6,6,2,9],[6,3,1,8],[3,3,2,7],[4,2,1,7],[7,3,3,8],[6,3,1,7],[6,5,5,8],[5,3,1,9],[6,5,1,8],[7,3,2,8],[6,6,1,5],[4,4,1,7],[4,4,1,6],[5,5,3,7],[4,3,3,7],[5,4,2,7],[5,5,1,6],[6,4,2,6],[8,6,3,9],[8,2,1,8],[7,4,3,9],[7,3,1,8],[3,2,2,7],[7,4,2,8]];
-        const hard_problems = [[5,4,2,6],[6,5,2,6],[2,6,8,9],[8,1,3,8],[5,2,9,7],[6,5,2,6],[6,3,2,8],[4,4,2,5],[5,3,3,7],[5,3,2,7],[6,3,3,8],[2,3,2,5],[6,4,1,9],[6,5,1,7],[6,4,1,7],[9,4,4,3],[9,7,2,4],[8,7,4,4],[8,5,2,5],[8,5,3,9],[7,4,3,8],[8,2,1,2],[8,5,2,2],[2,9,2,6],[6,4,2,8],[7,9,2,3],[8,7,5,9],[8,5,2,8],[8,3,2,9],[3,4,1,8],[7,5,5,4],[3,5,2,3],[8,8,5,9],[7,7,3,4],[4,5,1,2],[6,9,5,6],[5,2,2,7],[6,4,1,8],[6,4,1,6],[5,2,2,9],[7,8,3,5],[9,4,4,8],[8,8,7,5],[8,4,4,6],[5,4,2,5],[6,5,2,9],[5,3,3,3],[5,4,1,8],[8,7,2,9],[6,3,2,7]];
+        const easy_problems = [
+          [2, 2, 8, 6],
+          [2, 2, 8, 6],
+          [2, 2, 8, 6],
+          [2, 2, 4, 5],
+          [4, 2, 8, 4],
+          [8, 1, 8, 7],
+          [5, 4, 4, 8],
+          [8, 8, 4, 9],
+          [4, 4, 8, 8],
+          [1, 1, 6, 5],
+          [5, 4, 7, 3],
+          [7, 6, 5, 6],
+          [5, 1, 9, 2],
+          [6, 4, 7, 7],
+          [3, 9, 2, 5],
+          [8, 3, 6, 4],
+          [8, 3, 4, 3],
+          [4, 8, 1, 8],
+          [8, 8, 5, 1],
+          [3, 7, 7, 7],
+          [9, 7, 8, 1],
+          [2, 4, 1, 4],
+          [6, 6, 6, 6],
+          [9, 2, 1, 8],
+          [4, 3, 2, 1],
+          [3, 6, 3, 2],
+          [3, 4, 2, 6],
+          [8, 2, 1, 5],
+          [5, 1, 5, 4],
+          [6, 2, 1, 7],
+          [4, 8, 5, 7],
+          [9, 6, 8, 1],
+          [3, 9, 6, 6],
+          [8, 2, 8, 4],
+          [5, 7, 5, 7],
+          [6, 8, 6, 4],
+          [1, 8, 5, 7],
+          [1, 6, 8, 8],
+          [3, 4, 1, 3],
+          [7, 1, 1, 4],
+          [1, 2, 2, 7],
+          [6, 1, 5, 2],
+          [1, 2, 1, 9],
+          [7, 3, 8, 8],
+          [5, 4, 5, 3],
+          [8, 1, 1, 4],
+          [3, 3, 5, 6],
+          [2, 2, 4, 6],
+        ];
+        const medium_problems = [
+          [2, 6, 1, 6],
+          [5, 5, 1, 9],
+          [2, 2, 7, 6],
+          [3, 6, 1, 6],
+          [2, 2, 4, 7],
+          [4, 5, 8, 6],
+          [3, 3, 4, 5],
+          [5, 1, 7, 4],
+          [7, 8, 8, 9],
+          [2, 7, 6, 8],
+          [3, 8, 8, 9],
+          [6, 5, 6, 8],
+          [2, 1, 4, 9],
+          [6, 4, 4, 2],
+          [6, 1, 1, 9],
+          [3, 2, 7, 4],
+          [5, 8, 4, 9],
+          [4, 7, 2, 6],
+          [6, 7, 1, 9],
+          [7, 3, 1, 3],
+          [8, 1, 2, 7],
+          [2, 9, 5, 5],
+          [6, 2, 2, 5],
+          [5, 6, 9, 1],
+          [4, 4, 1, 8],
+          [9, 4, 4, 1],
+          [2, 3, 3, 8],
+          [5, 6, 4, 9],
+          [3, 2, 2, 6],
+          [2, 8, 2, 9],
+          [6, 3, 7, 5],
+          [5, 4, 3, 9],
+          [5, 4, 4, 3],
+          [3, 6, 6, 2],
+          [4, 2, 3, 4],
+          [1, 6, 5, 3],
+          [5, 7, 7, 6],
+          [4, 3, 4, 7],
+          [3, 6, 5, 2],
+          [8, 6, 6, 2],
+          [2, 8, 8, 7],
+          [5, 4, 4, 6],
+          [3, 1, 7, 2],
+          [1, 3, 8, 5],
+          [8, 7, 4, 8],
+          [7, 2, 2, 8],
+          [5, 8, 2, 6],
+          [1, 4, 3, 7],
+          [7, 8, 6, 5],
+          [4, 3, 2, 5],
+          [6, 2, 4, 9],
+          [4, 7, 2, 4],
+          [2, 8, 8, 9],
+          [3, 2, 5, 8],
+          [8, 7, 7, 2],
+          [3, 7, 7, 2],
+          [4, 2, 2, 8],
+          [8, 4, 2, 9],
+          [4, 7, 7, 1],
+          [7, 7, 2, 5],
+          [4, 7, 7, 5],
+          [5, 4, 3, 6],
+          [3, 2, 1, 6],
+          [6, 2, 1, 9],
+          [7, 4, 1, 9],
+          [6, 5, 3, 8],
+          [8, 3, 2, 4],
+          [7, 5, 1, 9],
+          [5, 3, 3, 9],
+          [5, 3, 1, 7],
+          [6, 3, 2, 9],
+          [6, 6, 3, 8],
+          [6, 6, 2, 9],
+          [6, 3, 1, 8],
+          [3, 3, 2, 7],
+          [4, 2, 1, 7],
+          [7, 3, 3, 8],
+          [6, 3, 1, 7],
+          [6, 5, 5, 8],
+          [5, 3, 1, 9],
+          [6, 5, 1, 8],
+          [7, 3, 2, 8],
+          [6, 6, 1, 5],
+          [4, 4, 1, 7],
+          [4, 4, 1, 6],
+          [5, 5, 3, 7],
+          [4, 3, 3, 7],
+          [5, 4, 2, 7],
+          [5, 5, 1, 6],
+          [6, 4, 2, 6],
+          [8, 6, 3, 9],
+          [8, 2, 1, 8],
+          [7, 4, 3, 9],
+          [7, 3, 1, 8],
+          [3, 2, 2, 7],
+          [7, 4, 2, 8],
+        ];
+        const hard_problems = [
+          [5, 4, 2, 6],
+          [6, 5, 2, 6],
+          [2, 6, 8, 9],
+          [8, 1, 3, 8],
+          [5, 2, 9, 7],
+          [6, 5, 2, 6],
+          [6, 3, 2, 8],
+          [4, 4, 2, 5],
+          [5, 3, 3, 7],
+          [5, 3, 2, 7],
+          [6, 3, 3, 8],
+          [2, 3, 2, 5],
+          [6, 4, 1, 9],
+          [6, 5, 1, 7],
+          [6, 4, 1, 7],
+          [9, 4, 4, 3],
+          [9, 7, 2, 4],
+          [8, 7, 4, 4],
+          [8, 5, 2, 5],
+          [8, 5, 3, 9],
+          [7, 4, 3, 8],
+          [8, 2, 1, 2],
+          [8, 5, 2, 2],
+          [2, 9, 2, 6],
+          [6, 4, 2, 8],
+          [7, 9, 2, 3],
+          [8, 7, 5, 9],
+          [8, 5, 2, 8],
+          [8, 3, 2, 9],
+          [3, 4, 1, 8],
+          [7, 5, 5, 4],
+          [3, 5, 2, 3],
+          [8, 8, 5, 9],
+          [7, 7, 3, 4],
+          [4, 5, 1, 2],
+          [6, 9, 5, 6],
+          [5, 2, 2, 7],
+          [6, 4, 1, 8],
+          [6, 4, 1, 6],
+          [5, 2, 2, 9],
+          [7, 8, 3, 5],
+          [9, 4, 4, 8],
+          [8, 8, 7, 5],
+          [8, 4, 4, 6],
+          [5, 4, 2, 5],
+          [6, 5, 2, 9],
+          [5, 3, 3, 3],
+          [5, 4, 1, 8],
+          [8, 7, 2, 9],
+          [6, 3, 2, 7],
+        ];
 
         const num_easy = easy_problems.length;
         const num_medium = medium_problems.length;
@@ -278,6 +485,7 @@
         const clearBtn = document.getElementById("clear");
         const backspaceBtn = document.getElementById("backspace");
         const timeEl = document.getElementById("time");
+        const difficultyEl = document.getElementById("difficulty");
         const operationBtns = document.querySelectorAll(".operation[data-op]");
 
         // Initialize game
@@ -303,9 +511,9 @@
         });
 
         function getRandomIntInclusive(min, max) {
-            min = Math.ceil(min);
-            max = Math.floor(max);
-            return Math.floor(Math.random() * (max - min + 1) + min);
+          min = Math.ceil(min);
+          max = Math.floor(max);
+          return Math.floor(Math.random() * (max - min + 1) + min);
         }
 
         // Game functions
@@ -328,46 +536,48 @@
         }
 
         function getRandomElement(array) {
-            const randomIndex = Math.floor(Math.random() * array.length);
-            return array[randomIndex];
+          const randomIndex = Math.floor(Math.random() * array.length);
+          return array[randomIndex];
         }
 
         function shuffle(array) {
-            let currentIndex = array.length;
+          let currentIndex = array.length;
 
-            // While there remain elements to shuffle...
-            while (currentIndex != 0) {
+          // While there remain elements to shuffle...
+          while (currentIndex != 0) {
+            // Pick a remaining element...
+            let randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
 
-                // Pick a remaining element...
-                let randomIndex = Math.floor(Math.random() * currentIndex);
-                currentIndex--;
-
-                // And swap it with the current element.
-                [array[currentIndex], array[randomIndex]] = [
-                array[randomIndex], array[currentIndex]];
-            }
+            // And swap it with the current element.
+            [array[currentIndex], array[randomIndex]] = [
+              array[randomIndex],
+              array[currentIndex],
+            ];
+          }
         }
 
         function generateNumbers() {
-            const n = getRandomIntInclusive(0, num_problems);
-            let difficulty = "";
-            let problem = [];
+          const n = getRandomIntInclusive(0, num_problems);
+          let difficulty = "";
+          let problem = [];
 
-            if (n <= num_easy) {
-                difficulty = "easy";
-                problem = getRandomElement(easy_problems);
-            } else if (n <= num_medium) {
-                difficulty = "medium";
-                problem = getRandomElement(medium_problems);
-            } else {
-                difficulty = "hard";
-                problem = getRandomElement(hard_problems);
-            }
+          if (n <= num_easy) {
+            difficulty = "Easy";
+            problem = getRandomElement(easy_problems);
+          } else if (n <= num_medium) {
+            difficulty = "Medium";
+            problem = getRandomElement(medium_problems);
+          } else {
+            difficulty = "Hard";
+            problem = getRandomElement(hard_problems);
+          }
 
-            console.log(`${difficulty}: ${problem}`);
-            shuffle(problem);
+          console.log(`${difficulty}: ${problem}`);
+          shuffle(problem);
+          difficultyEl.textContent = difficulty;
 
-            return problem;
+          return problem;
         }
 
         function findSolution(nums) {
@@ -442,25 +652,31 @@
         }
 
         function isNumeric(str) {
-            if (typeof str != "string") return false // Ensures the input is a string
-            return !isNaN(str) && // Use type conversion to determine if string is numeric
-                    !isNaN(parseFloat(str));
+          if (typeof str != "string") return false; // Ensures the input is a string
+          return (
+            !isNaN(str) && // Use type conversion to determine if string is numeric
+            !isNaN(parseFloat(str))
+          );
         }
 
         function backspaceExpression() {
-            if (currentExpression.length == 0) {
-                return;
-            }
+          if (currentExpression.length == 0) {
+            return;
+          }
 
-            console.log(`currentExpression before: ${JSON.stringify(currentExpression)}`);
+          console.log(
+            `currentExpression before: ${JSON.stringify(currentExpression)}`
+          );
 
-            let last = currentExpression.pop();
-            if (isNumeric(last)) {
-                usedNumbers.remove(last);
-            }
+          let last = currentExpression.pop();
+          if (isNumeric(last)) {
+            usedNumbers.remove(last);
+          }
 
-            console.log(`currentExpression after: ${JSON.stringify(currentExpression)}`);
-            updateExpression();
+          console.log(
+            `currentExpression after: ${JSON.stringify(currentExpression)}`
+          );
+          updateExpression();
         }
 
         function clearExpression() {
