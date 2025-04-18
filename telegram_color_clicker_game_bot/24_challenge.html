@@ -545,6 +545,10 @@
         const num_hard = hard_problems.length;
         const num_problems = num_easy + num_medium + num_hard;
 
+        const easy_odds = 50;
+        const medium_odds = 30;
+        const hard_odds = 20;
+
         // DOM elements
         const cards = document.querySelectorAll(".card");
         const expressionEl = document.getElementById("expression");
@@ -657,15 +661,15 @@
         }
 
         function generateNumbers() {
-          const n = getRandomIntInclusive(0, num_problems);
+          const n = getRandomIntInclusive(0, 100);
           let problem = [];
           let difficultyMultiplier = 1.0;
 
-          if (n <= num_easy) {
+          if (n <= easy_odds) {
             currentDifficulty = "Easy";
             problem = getRandomElement(easy_problems);
             difficultyMultiplier = 0.75;
-          } else if (n <= num_medium) {
+          } else if (n <= medium_odds) {
             currentDifficulty = "Medium";
             problem = getRandomElement(medium_problems);
             difficultyMultiplier = 1.0;
