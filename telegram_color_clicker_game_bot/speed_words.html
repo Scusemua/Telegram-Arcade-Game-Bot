@@ -195,7 +195,7 @@
       let currentSequence = "";
       let previousSequeqnce = "";
       let gameActive = false;
-      let submitted = Set();
+      let submitted = new Set();
 
       // Common letter sequences with many possible words
       const sequences = [
@@ -579,7 +579,7 @@
           updateDisplay();
           wordInput.value = "";
           wordInput.focus();
-        } else if (!isDuplicate) {
+        } else if (isDuplicate) {
           // Duplicate word
           messageDisplay.textContent = `You've already entered "${word}"`;
           messageDisplay.style.color = "#ff5252";
