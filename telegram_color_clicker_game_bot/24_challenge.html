@@ -271,6 +271,7 @@
 
       <div class="controls">
         <button id="check">Check</button>
+        <button id="give-up">Give Up</button>
         <button id="new-game" style="display: none">New Game</button>
         <!-- <button id="solution">Show Solution</button> -->
       </div>
@@ -538,7 +539,7 @@
         // Game settings
         const BASE_TIMER_SPEED = 450; // ms between updates (slower = faster timer)
         const MAX_SPEED_MULTIPLIER = 4; // Maximum speed increase
-        const SPEED_INCREASE_RATE = 1.0/30.0; // How much speed increases per point
+        const SPEED_INCREASE_RATE = 1.0 / 30.0; // How much speed increases per point
 
         const num_easy = easy_problems.length;
         const num_medium = medium_problems.length;
@@ -554,6 +555,7 @@
         const expressionEl = document.getElementById("expression");
         const messageEl = document.getElementById("message");
         const newGameBtn = document.getElementById("new-game");
+        const giveUpBtn = document.getElementById("give-up");
         const checkBtn = document.getElementById("check");
         // const solutionBtn = document.getElementById("solution");
         const clearBtn = document.getElementById("clear");
@@ -569,6 +571,7 @@
 
         // Event listeners
         newGameBtn.addEventListener("click", restart);
+        giveUpBtn.addEventListener("click", giveUp);
         checkBtn.addEventListener("click", checkSolution);
         // solutionBtn.addEventListener("click", showSolution);
         clearBtn.addEventListener("click", clearExpression);
@@ -592,9 +595,17 @@
           return Math.floor(Math.random() * (max - min + 1) + min);
         }
 
+        function giveUp() {
+          clearInterval(timerInterval);
+          giveUpBtn.style.display = "none";
+          timerWidth = 0;
+          endGame();
+        }
+
         function restart() {
           score = 0;
           timerWidth = 100;
+          giveUpBtn.style.display = "inline-block";
           timerEl.style.width = `${timerWidth}%`;
           timerEl.style.backgroundColor = "#4caf50";
           currentSpeedMultiplier = 1.0;
@@ -613,6 +624,7 @@
 
         // Game functions
         function newGame() {
+          giveUpBtn.style.display = "inline-block";
           solved = false;
 
           // Reset game state
@@ -953,6 +965,7 @@
         }
 
         function endGame() {
+          clearInterval(timerInterval);
           setGameOver();
 
           // POST request
@@ -991,10 +1004,9 @@
             timerEl.style.backgroundColor = "#f44336";
           } else if (timerWidth < 60) {
             timerEl.style.backgroundColor = "#FFC107";
-          } 
+          }
 
           if (timerWidth <= 0) {
-            clearInterval(timerInterval);
             endGame("Time's up!");
           }
         }
