@@ -32,14 +32,26 @@ As of right now, there are two games offered by the Telegram Arcade Bot.
 
 A simple Telegram-compatible HTML5 game where users must quickly click the rectangle that is correctly labeled with its color. Built using Python, Flask, and the Telegram Bot API.
 
-Try the game in your web browser [here](https://scusemua.github.io/Telegram-Color-Clicker-Game-Bot/).
-
 ### 🧠 Gameplay
 
 - Two colored rectangles are shown.
 - One is labeled correctly; the other is not.
 - Click the correct one **before time runs out** to score a point!
 - A wrong click or timeout ends the game.
+
+## ⌨️ Speed Words
+
+You are shown a string of characters. You must quickly type an English word that contains those characters before the timer expires.
+
+### 🧠 Gameplay
+
+- Given a sequence of letters, enter an English word containing those letters
+- You cannot re-use the same word multiple times (even for different sequences of characters)
+- You are awarded additional time for each correct word
+- You can increase the amount of time you are awarded by:
+  - Increasing your streak (i.e., the number of consecutive, valid submissions)
+  - Submitting longer words 
+  - Surviving longer (the more correct submissions, the more time you get back -- and the faster the timer decreases)
 
 ## ♾️ 24 Challenge / 24 Puzzle
 
