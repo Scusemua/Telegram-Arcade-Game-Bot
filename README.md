@@ -13,6 +13,8 @@ Try the game in your web browser [here](https://scusemua.github.io/Telegram-Colo
 - Click the correct one **before time runs out** to score a point!
 - A wrong click or timeout ends the game.
 
+_See the bottom of this README for a video preview of the game._
+
 ---
 
 ## 🚀 Features
@@ -38,3 +40,5 @@ pip install -r requirements.txt
 
 ## 📜 License
 MIT License. Free to use, modify, and share.
+
+https://github.com/user-attachments/assets/ee46cfd7-b0ee-45b2-a345-5fff096aad64
