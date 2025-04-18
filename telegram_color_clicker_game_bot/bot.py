@@ -219,10 +219,10 @@ class TelegramBot(object):
 
         @app.route("/game/<game_name>")
         def serve_game(game_name):
-            self.logger.debug(f'Serving gamea: "{game_name}"')
+            self.logger.debug(f'Serving game: "{game_name}"')
             
             if game_name not in GAMES:
-                self.logger.warning(f'Invalid gamea: "{game_name}"')
+                self.logger.warning(f'Invalid game: "{game_name}". Valid games: {",".join(GAMES)}')
                 abort(code=400, args=f'Invalid game: "{game_name}"')
             
             if game_name == COLOR_CLICKER_SHORT_NAME:
