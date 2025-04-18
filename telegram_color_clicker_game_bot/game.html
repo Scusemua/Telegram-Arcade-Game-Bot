@@ -229,6 +229,8 @@
       const urlParams = new URLSearchParams(window.location.search);
       const userId = urlParams.get("user_id"); // e.g., "12345"
       const chatId = urlParams.get("chat_id"); // Optional
+      const messageId = urlParams.get("message_id"); // Optional
+      const inlineMessageId = urlParams.get("inline_message_id"); // Optional
 
       console.log("Telegram User ID:", userId);
 
@@ -593,6 +595,8 @@
           score: score,
           user_id: userId,
           chat_id: chatId,
+          message_id: messageId,
+          inline_message_id: inlineMessageId,
         };
 
         fetch("/api/data", {
