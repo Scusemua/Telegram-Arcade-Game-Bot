@@ -2,6 +2,7 @@ import os
 import json
 import logging
 import requests
+from typing import List 
 from uuid import uuid4
 from typing import Dict, Any
 from flask import Flask, send_from_directory, jsonify, abort
@@ -15,6 +16,11 @@ from flask_cors import CORS
 
 COLOR_CLICKER_SHORT_NAME: str = "color_clicker"
 CHALLENGE_24_SHORT_NAME: str = "challenge24"
+WORD_GAME_SHORT_NAME: str = "speed_words"
+
+GAMES: List[str] = [
+    COLOR_CLICKER_SHORT_NAME, CHALLENGE_24_SHORT_NAME, WORD_GAME_SHORT_NAME
+]
 
 LOGGER_FORMAT: str = '%(asctime)s | %(levelname)s | %(message)s | %(name)s | %(funcName)s'
 
@@ -61,7 +67,9 @@ class TelegramBot(object):
             InlineQueryResultGame(
                 id=str(uuid4()), game_short_name=COLOR_CLICKER_SHORT_NAME),
             InlineQueryResultGame(
-                id=str(uuid4()), game_short_name=CHALLENGE_24_SHORT_NAME)
+                id=str(uuid4()), game_short_name=CHALLENGE_24_SHORT_NAME),
+            InlineQueryResultGame(
+                id=str(uuid4()), game_short_name=WORD_GAME_SHORT_NAME)
         ]
         await update.inline_query.answer(results, cache_time=0)
 
@@ -71,7 +79,7 @@ class TelegramBot(object):
         
         self.logger.debug(f'game_short_name: "{game_short_name}"')
     
-        if game_short_name != COLOR_CLICKER_SHORT_NAME and game_short_name != CHALLENGE_24_SHORT_NAME:
+        if game_short_name not in GAMES:
             await callback_query.answer(text="Unknown game.", cache_time=0)
             return 
 
@@ -215,6 +223,8 @@ class TelegramBot(object):
                 return send_from_directory(".", "color_clicker.html")
             elif game_name == CHALLENGE_24_SHORT_NAME:
                 return send_from_directory(".", "24_challenge.html")
+            elif game_name == WORD_GAME_SHORT_NAME:
+                return send_from_directory(".", "speed_words.html")
             
             abort(code=400, args=f'Invalid game: "{game_name}"')
 

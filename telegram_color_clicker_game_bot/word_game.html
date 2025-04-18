@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Word Sequence Challenge</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #fff;
+      }
+
+      .game-container {
+        background-color: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 30px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        text-align: center;
+      }
+
+      h1 {
+        margin-top: 0;
+        font-weight: 600;
+        font-size: 2.2rem;
+      }
+
+      .sequence-display {
+        font-size: 3rem;
+        font-weight: bold;
+        margin: 30px 0;
+        letter-spacing: 5px;
+        color: #ffcc00;
+        text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      }
+
+      .input-container {
+        margin: 20px 0;
+      }
+
+      input {
+        width: 80%;
+        padding: 15px;
+        border: none;
+        border-radius: 50px;
+        font-size: 1.2rem;
+        text-align: center;
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+        outline: none;
+        transition: all 0.3s;
+      }
+
+      input:focus {
+        background-color: rgba(255, 255, 255, 0.3);
+        transform: scale(1.02);
+      }
+
+      input::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .stats {
+        display: flex;
+        justify-content: space-around;
+        margin: 30px 0;
+      }
+
+      .stat-box {
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 15px;
+        border-radius: 10px;
+        min-width: 100px;
+      }
+
+      .stat-value {
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin: 5px 0;
+      }
+
+      .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.8;
+      }
+
+      .timer-container {
+        height: 10px;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 5px;
+        margin: 20px 0;
+        overflow: hidden;
+      }
+
+      .timer-bar {
+        height: 100%;
+        width: 100%;
+        background-color: #4caf50;
+        transition: width 0.1s linear;
+      }
+
+      .message {
+        min-height: 24px;
+        margin: 10px 0;
+        font-weight: bold;
+        color: #ffcc00;
+      }
+
+      .start-btn {
+        background-color: #ff6b6b;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 1.2rem;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 20px;
+        font-weight: bold;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .start-btn:hover {
+        background-color: #ff5252;
+        transform: translateY(-2px);
+      }
+
+      .start-btn:active {
+        transform: translateY(0);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="game-container">
+      <h1>Word Sequence Challenge</h1>
+      <div class="sequence-display" id="sequence">---</div>
+      <div class="message" id="message"></div>
+      <div class="input-container">
+        <input
+          type="text"
+          id="word-input"
+          placeholder="Type a word containing the sequence..."
+          disabled
+        />
+      </div>
+      <div class="timer-container">
+        <div class="timer-bar" id="timer-bar"></div>
+      </div>
+      <div class="stats">
+        <div class="stat-box">
+          <div class="stat-value" id="score">0</div>
+          <div class="stat-label">Score</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="speed">0</div>
+          <div class="stat-label">Speed</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="streak">0</div>
+          <div class="stat-label">Streak</div>
+        </div>
+      </div>
+      <button class="start-btn" id="start-btn">Start Game</button>
+    </div>
+
+    <script>
+      // Get the user ID from the URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const userId = urlParams.get("user_id"); // e.g., "12345"
+      const chatId = urlParams.get("chat_id"); // Optional
+      const messageId = urlParams.get("message_id"); // Optional
+      const inlineMessageId = urlParams.get("inline_message_id"); // Optional
+
+      // Game settings
+      const BASE_TIMER_SPEED = 300; // ms between updates (slower = faster timer)
+      const MAX_SPEED_MULTIPLIER = 2; // Maximum speed increase
+      const SPEED_INCREASE_RATE = 0.025; // How much speed increases per point
+      const MULTIPLIER_DECIMALS = 3;
+
+      // Game variables
+      let currentSpeedMultiplier = 1.0;
+      let score = 0;
+      let streak = 0;
+      let timeLeft = 0;
+      let timer;
+      let currentSequence = "";
+      let previousSequeqnce = "";
+      let gameActive = false;
+
+      // Common letter sequences with many possible words
+      const sequences = [
+        "ing",
+        "tion",
+        "ous",
+        "ent",
+        "ate",
+        "ive",
+        "ity",
+        "ment",
+        "ness",
+        "able",
+        "ible",
+        "ance",
+        "ence",
+        "less",
+        "ful",
+        "est",
+        "er",
+        "ly",
+        "ie",
+        "ei",
+        "ou",
+        "ai",
+        "ea",
+        "oo",
+        "ph",
+        "ch",
+        "sh",
+        "th",
+        "gh",
+        "ac",
+        "ad",
+        "ag",
+        "al",
+        "an",
+        "ap",
+        "ar",
+        "as",
+        "at",
+        "be",
+        "bi",
+        "co",
+        "de",
+        "di",
+        "ed",
+        "en",
+        "er",
+        "es",
+        "ex",
+        "ic",
+        "id",
+        "il",
+        "im",
+        "in",
+        "ir",
+        "is",
+        "it",
+        "le",
+        "li",
+        "ly",
+        "ma",
+        "me",
+        "mi",
+        "mo",
+        "na",
+        "ne",
+        "ni",
+        "no",
+        "ob",
+        "oc",
+        "of",
+        "on",
+        "op",
+        "or",
+        "os",
+        "ot",
+        "ou",
+        "pe",
+        "po",
+        "pr",
+        "qu",
+        "ra",
+        "re",
+        "ri",
+        "ro",
+        "se",
+        "si",
+        "so",
+        "st",
+        "ta",
+        "te",
+        "ti",
+        "to",
+        "tr",
+        "un",
+        "up",
+        "ur",
+        "us",
+        "ut",
+        "ve",
+        "wa",
+        "we",
+        "wi",
+        "yo",
+      ];
+
+      // DOM elements
+      const sequenceDisplay = document.getElementById("sequence");
+      const wordInput = document.getElementById("word-input");
+      const scoreDisplay = document.getElementById("score");
+      const streakDisplay = document.getElementById("streak");
+      const speedDisplay = document.getElementById("speed");
+      const timerBar = document.getElementById("timer-bar");
+      const messageDisplay = document.getElementById("message");
+      const startBtn = document.getElementById("start-btn");
+
+      function roundUpToNearest(number, multiple) {
+        return Math.ceil(number / multiple) * multiple;
+      }
+
+      // Initialize game
+      function initGame() {
+        score = 0;
+        streak = 0;
+        currentSpeedMultiplier = 1.0;
+        updateDisplay();
+        wordInput.value = "";
+        messageDisplay.textContent = "";
+        startBtn.textContent = "Start Game";
+        gameActive = false;
+        clearInterval(timer);
+        timerBar.style.width = "100%";
+        sequenceDisplay.textContent = "---";
+        wordInput.disabled = true;
+      }
+
+      // Start game
+      function startGame() {
+        initGame();
+        gameActive = true;
+        startBtn.textContent = "Restart Game";
+        wordInput.disabled = false;
+        wordInput.focus();
+        nextSequence();
+        startTimer();
+      }
+
+      // Get a random sequence
+      function getRandomSequence() {
+        // Weight towards 3-letter sequences (70% chance)
+        const useThreeLetters = Math.random() < 0.7;
+        const filteredSequences = sequences.filter((seq) =>
+          useThreeLetters ? seq.length === 3 : seq.length === 2
+        );
+
+        return filteredSequences[
+          Math.floor(Math.random() * filteredSequences.length)
+        ];
+      }
+
+      // Display next sequence
+      function nextSequence() {
+        while (currentSequence == previousSequeqnce) {
+          currentSequence = getRandomSequence();
+        }
+        previousSequeqnce = currentSequence;
+        sequenceDisplay.textContent = currentSequence;
+        messageDisplay.textContent = "";
+      }
+
+      // Start timer
+      function startTimer() {
+        timeLeft = 100;
+        updateTimerDisplay();
+
+        clearInterval(timer);
+        timer = setInterval(() => {
+          timeLeft -= 1;
+          updateTimerDisplay();
+
+          if (timeLeft <= 0) {
+            clearInterval(timer);
+            timeUp();
+          }
+        }, BASE_TIMER_SPEED / currentSpeedMultiplier);
+      }
+
+      // Update timer display
+      function updateTimerDisplay() {
+        const percentage = Math.max(0, timeLeft);
+        timerBar.style.width = `${percentage}%`;
+
+        // Change color as time runs low
+        if (percentage < 30) {
+          timerBar.style.backgroundColor = "#ff5252";
+        } else if (percentage < 60) {
+          timerBar.style.backgroundColor = "#ffb142";
+        } else {
+          timerBar.style.backgroundColor = "#4CAF50";
+        }
+      }
+
+      // Time's up
+      function timeUp() {
+        messageDisplay.textContent = "Time's up!";
+        streak = 0;
+        updateDisplay();
+        wordInput.disabled = true;
+
+        // POST request
+        const data = {
+          score: score,
+          user_id: userId,
+          chat_id: chatId,
+          message_id: messageId,
+          inline_message_id: inlineMessageId,
+        };
+
+        fetch("/api/data", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (responseElement) {
+              responseElement.textContent = JSON.stringify(data);
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
+
+        // Show correct answer after delay
+        // setTimeout(() => {
+        //     if (gameActive) {
+        //         nextSequence();
+        //         wordInput.disabled = false;
+        //         wordInput.value = '';
+        //         wordInput.focus();
+        //         startTimer();
+        //     }
+        // }, 1500);
+      }
+
+      // Check if word is valid
+      function isValidWord(word) {
+        if (word.length < currentSequence.length + 1) return false;
+
+        // Check if word contains the sequence
+        if (!word.toLowerCase().includes(currentSequence.toLowerCase())) {
+          return false;
+        }
+
+        // In a real game, you'd want to verify against a dictionary API
+        // For this demo, we'll assume all words containing the sequence are valid
+        return true;
+      }
+
+      // Handle word submission
+      function checkWord() {
+        const word = wordInput.value.trim();
+
+        if (!word) return;
+
+        if (isValidWord(word)) {
+          // Correct word
+          score++;
+          streak++;
+
+          // Reset timer
+          clearInterval(timer);
+
+          currentSpeedMultiplier = Math.min(
+            roundUpToNearest(
+              currentSpeedMultiplier + SPEED_INCREASE_RATE,
+              SPEED_INCREASE_RATE
+            ),
+            MAX_SPEED_MULTIPLIER
+          );
+
+          updateDisplay();
+          messageDisplay.textContent = "Correct! +1 point";
+          messageDisplay.style.color = "#4CAF50";
+
+          let increment = 2;
+          increment = increment * Math.min(currentSpeedMultiplier * 0.75, 1.0)
+
+          // Extra time for quick responses
+          timeLeft = Math.min(100, timeLeft + increment);
+          updateTimerDisplay();
+
+          console.log(
+            `Incrementing currentSpeedMultiplier: ${currentSpeedMultiplier} --> ${
+              currentSpeedMultiplier + SPEED_INCREASE_RATE
+            }`
+          );
+
+          timer = setInterval(() => {
+            timeLeft -= 1;
+            updateTimerDisplay();
+
+            if (timeLeft <= 0) {
+              clearInterval(timer);
+              timeUp();
+            }
+          }, BASE_TIMER_SPEED / currentSpeedMultiplier);
+
+          // Next sequence
+          wordInput.value = "";
+          nextSequence();
+          wordInput.focus();
+        } else {
+          // Incorrect word
+          messageDisplay.textContent = "Word must contain the sequence!";
+          messageDisplay.style.color = "#ff5252";
+          streak = 0;
+          updateDisplay();
+          wordInput.value = "";
+          wordInput.focus();
+        }
+      }
+
+      // Update score and streak displays
+      function updateDisplay() {
+        scoreDisplay.textContent = score;
+        streakDisplay.textContent = streak;
+        speedDisplay.textContent =
+          currentSpeedMultiplier.toFixed(MULTIPLIER_DECIMALS) + "x";
+      }
+
+      // Event listeners
+      startBtn.addEventListener("click", startGame);
+
+      wordInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter" && gameActive) {
+          checkWord();
+        }
+      });
+
+      // Initialize game on load
+      initGame();
+    </script>
+  </body>
+</html>
