@@ -137,11 +137,139 @@
       .start-btn:active {
         transform: translateY(0);
       }
+
+      /* Base styles for the info button */
+      .info-button {
+        display: inline-block;
+        position: relative;
+        cursor: pointer;
+        margin: 0 5px;
+      }
+
+      /* The info icon (circle with 'i') */
+      .info-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: #3498db;
+        color: white;
+        font-family: Arial, sans-serif;
+        font-weight: bold;
+        font-size: 14px;
+        text-align: center;
+        line-height: 1;
+        transition: background-color 0.3s;
+      }
+
+      /* Hover effect for the icon */
+      .info-button:hover .info-icon {
+        background-color: #2980b9;
+      }
+
+      /* The tooltip that appears on hover/click */
+      .info-tooltip {
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        margin-top: 10px;
+        padding: 10px;
+        width: 300px;
+        background-color: #333;
+        color: white;
+        border-radius: 4px;
+        font-size: 14px;
+        line-height: 1.4;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s, visibility 0.3s;
+        z-index: 100;
+      }
+
+      /* Arrow for the tooltip */
+      .info-tooltip::after {
+        content: "";
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 5px;
+        border-style: solid;
+        border-color: transparent transparent #333 transparent;
+      }
+
+      /* Show tooltip on hover */
+      .info-button:hover .info-tooltip {
+        opacity: 0.95;
+        visibility: visible;
+      }
+
+      /* Show tooltip when active (clicked) */
+      .info-button.active .info-tooltip {
+        opacity: 0.95;
+        visibility: visible;
+      }
+
+      /* Mobile-friendly: show tooltip below on small screens */
+      @media (max-width: 480px) {
+        .info-tooltip {
+          left: 0;
+          transform: none;
+          width: 180px;
+        }
+
+        .info-tooltip::after {
+          left: 15px;
+          transform: none;
+        }
+      }
+
+      .side-by-side {
+        margin: auto;
+      }
+
+      .left-side {
+        float: left;
+      }
+
+      .right-side {
+        float: right;
+      }
+
+      #clear {
+        clear: both;
+      }
     </style>
   </head>
   <body>
     <div class="game-container">
-      <h1>Word Sequence Challenge</h1>
+      <div class="side-by-side">
+        <div id="first">
+          <h1>Word Sequence Challenge</h1>
+        </div>
+        <div id="second">
+          <span class="info-button" onclick="this.classList.toggle('active')">
+            <span class="info-icon">i</span>
+            <span class="info-tooltip">
+              The amount of time you get back for a correct word is increased by
+              the following:
+              <ul style="text-align: left">
+                <li>Having a larger streak</li>
+                <li>
+                  Having a larger speed multiplier (increases for each correct
+                  word)
+                </li>
+                <li>Entering longer words</li>
+              </ul>
+            </span>
+          </span>
+        </div>
+        <div id="clear"></div>
+      </div>
+
       <div class="sequence-display" id="sequence">---</div>
       <div class="message" id="message"></div>
       <div class="input-container">
@@ -179,6 +307,15 @@
       const chatId = urlParams.get("chat_id"); // Optional
       const messageId = urlParams.get("message_id"); // Optional
       const inlineMessageId = urlParams.get("inline_message_id"); // Optional
+
+      // Close tooltip when clicking anywhere else on the page
+      document.addEventListener("click", function (event) {
+        if (!event.target.closest(".info-button")) {
+          document.querySelectorAll(".info-button").forEach((button) => {
+            button.classList.remove("active");
+          });
+        }
+      });
 
       // Game settings
       const BASE_TIMER_SPEED = 300; // ms between updates (slower = faster timer)
@@ -494,7 +631,9 @@
           return false;
         }
 
-        const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+        const response = await fetch(
+          `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
+        );
         return response.ok;
       }
 
@@ -533,7 +672,11 @@
           messageDisplay.textContent = "Correct! +1 point";
           messageDisplay.style.color = "#4CAF50";
 
-          let increment = 1 + currentSpeedMultiplier + Math.min(streak * 0.075, 5) + (word.length * 0.75);
+          let increment =
+            1 +
+            currentSpeedMultiplier +
+            Math.min(streak * 0.075, 5) +
+            word.length * 0.75;
 
           if (currentSpeedMultiplier >= 1.5) {
             increment += getRandomFloat(0, currentSpeedMultiplier);
