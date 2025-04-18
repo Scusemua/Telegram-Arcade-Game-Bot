@@ -21,6 +21,7 @@ Try the game in your web browser [here](https://scusemua.github.io/Telegram-Colo
 - Telegram bot integration using `python-telegram-bot`
 - Easy deployment with HTTPS (use [ngrok](https://ngrok.com/) or host on your server)
 - Extensible for score tracking, leaderboards, etc.
+- Support for leaderboards and high score tracking within Telegram
 
 ---
 
