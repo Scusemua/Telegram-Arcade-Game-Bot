@@ -598,6 +598,8 @@
           // Reset game state
           timerWidth = 100;
           timerEl.style.width = `${timerWidth}%`;
+          timerEl.style.backgroundColor = "#FFC107";
+          newGameBtn.style.display = "none";
           numbers = generateNumbers();
           usedNumbers = [];
           currentExpression = [];
@@ -612,7 +614,7 @@
 
           // Calculate timer speed based on score
           currentSpeedMultiplier = Math.min(
-            1 + score * SPEED_INCREASE_RATE,
+            currentSpeedMultiplier + SPEED_INCREASE_RATE,
             MAX_SPEED_MULTIPLIER
           );
           speedEl.textContent = currentSpeedMultiplier.toFixed(1) + "x";
