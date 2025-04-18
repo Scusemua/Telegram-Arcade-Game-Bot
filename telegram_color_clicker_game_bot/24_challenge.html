@@ -596,7 +596,7 @@
           score = 0;
           timerWidth = 100;
           timerEl.style.width = `${timerWidth}%`;
-          timerEl.style.backgroundColor = "#FFC107";
+          timerEl.style.backgroundColor = "#4caf50";
           currentSpeedMultiplier = 1.0;
           newGame();
         }
@@ -618,7 +618,7 @@
           // Reset game state
           timerWidth = 100;
           timerEl.style.width = `${timerWidth}%`;
-          timerEl.style.backgroundColor = "#FFC107";
+          timerEl.style.backgroundColor = "#4caf50";
           newGameBtn.style.display = "none";
           numbers = generateNumbers();
           usedNumbers = [];
@@ -991,7 +991,7 @@
             timerEl.style.backgroundColor = "#f44336";
           } else if (timerWidth < 60) {
             timerEl.style.backgroundColor = "#FFC107";
-          }
+          } 
 
           if (timerWidth <= 0) {
             clearInterval(timerInterval);
