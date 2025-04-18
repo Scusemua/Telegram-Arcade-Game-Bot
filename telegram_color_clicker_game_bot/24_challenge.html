@@ -271,7 +271,7 @@
 
       <div class="controls">
         <button id="check">Check</button>
-        <button id="new-game" style="display: none;">New Game</button>
+        <button id="new-game" style="display: none">New Game</button>
         <!-- <button id="solution">Show Solution</button> -->
       </div>
 
@@ -588,12 +588,12 @@
         }
 
         function restart() {
-            score = 0;
-            timerWidth = 100;
-            timerEl.style.width = `${timerWidth}%`;
-            timerEl.style.backgroundColor = "#FFC107";
-            currentSpeedMultiplier = 1.0;
-            newGame();
+          score = 0;
+          timerWidth = 100;
+          timerEl.style.width = `${timerWidth}%`;
+          timerEl.style.backgroundColor = "#FFC107";
+          currentSpeedMultiplier = 1.0;
+          newGame();
         }
 
         // Game functions
@@ -615,11 +615,6 @@
           messageEl.className = "message";
           messageEl.textContent = "";
 
-          // Calculate timer speed based on score
-          currentSpeedMultiplier = Math.min(
-            currentSpeedMultiplier + SPEED_INCREASE_RATE,
-            MAX_SPEED_MULTIPLIER
-          );
           speedEl.textContent = currentSpeedMultiplier.toFixed(1) + "x";
 
           // Log solution for debugging (remove in production)
@@ -1150,6 +1145,12 @@
               scoreEl.textContent = score.toString();
 
               clearInterval(timerInterval);
+
+              // Calculate timer speed based on score
+              currentSpeedMultiplier = Math.min(
+                currentSpeedMultiplier + SPEED_INCREASE_RATE,
+                MAX_SPEED_MULTIPLIER
+              );
 
               setTimeout(newGame, nextRoundDelay);
             } else {
