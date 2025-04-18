@@ -119,6 +119,47 @@ class TelegramBot(object):
     def run_http_server(self):
         app = Flask(__name__)
         CORS(app)  # Allow all origins
+        
+        @app.route('/api/highscores', methods=['GET'])
+        def get_highscores():
+            user_id = request.args.get("user_id")
+            inline_message_id = request.args.get("inline_message_id", "")
+            chat_id = request.args.get('chat_id', "")
+            message_id = request.args.get("message_id", "")
+            
+            self.logger.debug(f"Received GET request: /api/highscores[UserID={user_id}, ChatID={chat_id}, MessageID={message_id}, InlineMessageID={inline_message_id}]")
+            
+            request_payload: Dict[str, Any] = {
+                "user_id": int(user_id),
+                "force": False,
+                "disable_edit_message": False,
+                "inline_message_id": inline_message_id,
+                # "force": True,  # Override previous score
+            }
+
+            if chat_id != "":
+                request_payload['chat_id'] = int(chat_id)
+
+            if message_id != "":
+                request_payload['message_id'] = int(message_id)
+            
+            # Call Telegram API
+            response = requests.post(
+                f"https://api.telegram.org/bot{self._token}/getGameHighScores",
+                request_payload,
+            )
+            
+            res = response.json()
+            
+            if not isinstance(res, dict) or not res.get("ok", False):
+                return jsonify({})
+
+            resp = {
+                "highscores": response.json()['result'],
+            }
+            self.logger.debug(f'Returning from Telegram: {json.dumps(resp, indent = "  ")}')
+            
+            return jsonify(resp)
 
         @app.route('/api/data', methods=['POST'])
         def handle_data():
