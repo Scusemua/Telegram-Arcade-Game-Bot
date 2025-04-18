@@ -643,6 +643,11 @@
         return response.ok;
       }
 
+      function containsCurrentSequence(word) {
+        // Check if word contains the sequence
+        return word.toLowerCase().includes(currentSequence.toLowerCase());
+      }
+
       function getRandomFloat(min, max) {
         return Math.random() * (max - min) + min;
       }
@@ -654,9 +659,10 @@
         if (!word) return;
 
         const isValid = await isValidWord(word);
+        const hasSequence = containsCurrentSequence(word);
         const isDuplicate = submitted.has(word);
 
-        if (isValid && !isDuplicate) {
+        if (isValid && hasSequence && !isDuplicate) {
           // Correct word
           score++;
           streak++;
@@ -712,8 +718,8 @@
           wordInput.value = "";
           nextSequence();
           wordInput.focus();
-        } else if (!isValid) {
-          // Incorrect word
+        } else if (!hasSequence) {
+          // Does not contain current sequence
           messageDisplay.textContent = "Word must contain the sequence!";
           messageDisplay.style.color = "#ff5252";
           streak = 0;
@@ -724,6 +730,14 @@
           // Duplicate word
           messageDisplay.textContent = `You've already entered "${word}"`;
           messageDisplay.style.color = "#ff5252";
+          updateDisplay();
+          wordInput.value = "";
+          wordInput.focus();
+        } else {
+          // Invalid word
+          messageDisplay.textContent = `Unknown or invalid word: ${word}`;
+          messageDisplay.style.color = "#ff5252";
+          streak = 0;
           updateDisplay();
           wordInput.value = "";
           wordInput.focus();
