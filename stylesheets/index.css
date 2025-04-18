@@ -65,6 +65,8 @@ h1 {
     height: 180px;
     background-size: cover;
     background-position: center;
+    width: 100%;
+    text-align: center;
 }
 
 .game-content {

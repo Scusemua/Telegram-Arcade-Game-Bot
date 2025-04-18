@@ -51,6 +51,7 @@
         background: linear-gradient(145deg, #ffffff, #e6e9ed);
         border-radius: 10px;
         display: flex;
+        padding: 0;
         justify-content: center;
         align-items: center;
         font-size: 36px;
@@ -86,6 +87,7 @@
         color: white;
         border: none;
         border-radius: 10px;
+        padding: 0;
         font-size: 24px;
         cursor: pointer;
         transition: all 0.2s;
@@ -281,6 +283,8 @@
         <button class="operation" data-op="-">-</button>
         <button class="operation" data-op="×">×</button>
         <button class="operation" data-op="÷">÷</button>
+      </div>
+      <div class="operations">
         <button class="operation" data-op="(">(</button>
         <button class="operation" data-op=")">)</button>
         <button class="operation" id="backspace" data-op="backspace">⌫</button>
@@ -556,7 +560,7 @@
         let solved = false;
 
         // Game settings
-        const BASE_TIMER_SPEED = 450; // ms between updates (slower = faster timer)
+        const BASE_TIMER_SPEED = 600; // ms between updates (slower = faster timer)
         const MAX_SPEED_MULTIPLIER = 4; // Maximum speed increase
         const SPEED_INCREASE_RATE = 1.0 / 30.0; // How much speed increases per point
 
