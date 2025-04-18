@@ -66,9 +66,14 @@ class TelegramBot(object):
         await update.inline_query.answer(results, cache_time=0)
 
     async def game_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        query = update.callback_query
-        if query.game_short_name != GAME_SHORT_NAME:
-            await query.answer(text="Unknown game.", cache_time=0)
+        callback_query = update.callback_query
+        chat_id = callback_query.message.chat.id  # Group chat ID
+        user_id = callback_query.from_user.id     # User who clicked "Play"
+        game_short_name = callback_query.game_short_name
+    
+        if game_short_name != GAME_SHORT_NAME:
+            await callback_query.answer(text="Unknown game.", cache_time=0)
+            return 
 
         self.logger.debug(f"game_callback::update: {update}")
 
@@ -76,7 +81,7 @@ class TelegramBot(object):
 
         self.logger.debug(f'url: "{url}"')
 
-        await query.answer(text=f"Click to play: {self._game_url}", url=url, cache_time=0)
+        await callback_query.answer(text=f"Click to play: {self._game_url}", url=url, cache_time=0)
 
     async def handle_web_app_data(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_id = update.effective_user.id
