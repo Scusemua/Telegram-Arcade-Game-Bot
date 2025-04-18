@@ -89,6 +89,8 @@ You are shown a string of characters. You must quickly type an English word that
   - Submitting longer words 
   - Surviving longer (the more correct submissions, the more time you get back -- and the faster the timer decreases)
 
+https://github.com/user-attachments/assets/8673f6e2-6ae2-4d56-80ec-8ad53177d637
+
 ## ♾️ 24 Challenge / 24 Puzzle
 
 ### 🧠 Gameplay
@@ -97,7 +99,5 @@ You are shown a string of characters. You must quickly type an English word that
 - One is labeled correctly; the other is not.
 - Click the correct one **before time runs out** to score a point!
 - A wrong click or timeout ends the game.
-
-_See the bottom of this README for a video preview of the game._
 
 https://github.com/user-attachments/assets/ee46cfd7-b0ee-45b2-a345-5fff096aad64
