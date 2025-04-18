@@ -1,3 +1,4 @@
+import os
 import json
 import logging
 import requests
@@ -12,7 +13,9 @@ from flask import Flask, send_from_directory, request
 
 from flask_cors import CORS
 
-GAME_SHORT_NAME: str = "color_clicker"
+COLOR_CLICKER_SHORT_NAME: str = "color_clicker"
+CHALLENGE_24_SHORT_NAME: str = "challenge24"
+
 LOGGER_FORMAT: str = '%(asctime)s | %(levelname)s | %(message)s | %(name)s | %(funcName)s'
 
 class TelegramBot(object):
@@ -51,20 +54,22 @@ class TelegramBot(object):
 
     async def play(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         self.logger.info(f'Sending game to chat "{update.effective_chat.id}"')
-        await context.bot.send_game(chat_id=update.effective_chat.id, game_short_name=GAME_SHORT_NAME)
+        await context.bot.send_game(chat_id=update.effective_chat.id, game_short_name=COLOR_CLICKER_SHORT_NAME)
 
     async def inline_query(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         results = [
             InlineQueryResultGame(
-                id=str(uuid4()), game_short_name=GAME_SHORT_NAME)
+                id=str(uuid4()), game_short_name=COLOR_CLICKER_SHORT_NAME)
         ]
         await update.inline_query.answer(results, cache_time=0)
 
     async def game_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         callback_query = update.callback_query
         game_short_name = callback_query.game_short_name
+        
+        self.logger.debug(f'game_short_name: "{game_short_name}"')
     
-        if game_short_name != GAME_SHORT_NAME:
+        if game_short_name != COLOR_CLICKER_SHORT_NAME and game_short_name != CHALLENGE_24_SHORT_NAME:
             await callback_query.answer(text="Unknown game.", cache_time=0)
             return 
 
@@ -94,7 +99,7 @@ class TelegramBot(object):
         
         inline_message_id = callback_query.inline_message_id or ""
 
-        url: str = f'{self._game_url}?user_id={user_id}&chat_id={chat_id}&inline_message_id={inline_message_id}&message_id={message_id}'
+        url: str = f'{self._game_url}/game/{game_short_name}?user_id={user_id}&chat_id={chat_id}&inline_message_id={inline_message_id}&message_id={message_id}'
 
         self.logger.debug(f'url: "{url}"')
 
@@ -204,9 +209,9 @@ class TelegramBot(object):
 
         @app.route("/game/<game_name>")
         def serve_game(game_name):
-            if game_name == "color_clicker":
+            if game_name == COLOR_CLICKER_SHORT_NAME:
                 return send_from_directory(".", "color_clicker.html")
-            elif game_name == "24_challenge":
+            elif game_name == CHALLENGE_24_SHORT_NAME:
                 return send_from_directory(".", "24_challenge.html")
             
             abort(code=400, args=f'Invalid game: "{game_name}"')
