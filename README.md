@@ -1,23 +1,6 @@
-# 🎮 Color Clicker Telegram Game Bot
+# 🎮 Telegram Arcade Bot 👾
 
-![logo](https://github.com/user-attachments/assets/979bc779-8047-474a-8d0e-32001e35d583)
-
-A simple Telegram-compatible HTML5 game where users must quickly click the rectangle that is correctly labeled with its color. Built using Python, Flask, and the Telegram Bot API.
-
-Try the game in your web browser [here](https://scusemua.github.io/Telegram-Color-Clicker-Game-Bot/).
-
----
-
-## 🧠 Gameplay
-
-- Two colored rectangles are shown.
-- One is labeled correctly; the other is not.
-- Click the correct one **before time runs out** to score a point!
-- A wrong click or timeout ends the game.
-
-_See the bottom of this README for a video preview of the game._
-
----
+This bot offers several different Telegram games.
 
 ## 🚀 Features
 
@@ -27,13 +10,11 @@ _See the bottom of this README for a video preview of the game._
 - Extensible for score tracking, leaderboards, etc.
 - Support for leaderboards and high score tracking within Telegram
 
----
-
 ## 📦 Requirements
 
 - Python 3.8+
 - Telegram Bot Token from [BotFather](https://t.me/botfather)
-- A game registered with a short name via `/setgame`
+- Two games registered with a short name via `/setgame`
 
 Install dependencies:
 ```bash
@@ -42,5 +23,35 @@ pip install -r requirements.txt
 
 ## 📜 License
 MIT License. Free to use, modify, and share.
+
+# Included Games
+
+As of right now, there are two games offered by the Telegram Arcade Bot.
+
+## 🎨 Color Clicker
+
+A simple Telegram-compatible HTML5 game where users must quickly click the rectangle that is correctly labeled with its color. Built using Python, Flask, and the Telegram Bot API.
+
+Try the game in your web browser [here](https://scusemua.github.io/Telegram-Color-Clicker-Game-Bot/).
+
+---
+
+### 🧠 Gameplay
+
+- Two colored rectangles are shown.
+- One is labeled correctly; the other is not.
+- Click the correct one **before time runs out** to score a point!
+- A wrong click or timeout ends the game.
+
+## ♾️ 24 Challenge / 24 Puzzle
+
+### 🧠 Gameplay
+
+- Two colored rectangles are shown.
+- One is labeled correctly; the other is not.
+- Click the correct one **before time runs out** to score a point!
+- A wrong click or timeout ends the game.
+
+_See the bottom of this README for a video preview of the game._
 
 https://github.com/user-attachments/assets/ee46cfd7-b0ee-45b2-a345-5fff096aad64
