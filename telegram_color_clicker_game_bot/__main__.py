@@ -67,8 +67,6 @@ class TelegramBot(object):
 
     async def game_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         callback_query = update.callback_query
-        chat_id = callback_query.message.chat.id  # Group chat ID
-        user_id = callback_query.from_user.id     # User who clicked "Play"
         game_short_name = callback_query.game_short_name
     
         if game_short_name != GAME_SHORT_NAME:
@@ -76,8 +74,22 @@ class TelegramBot(object):
             return 
 
         self.logger.debug(f"game_callback::update: {update}")
+        
+        try:
+            chat_id = callback_query.message.chat.id  # Group chat ID
+            self.logger.debug(f'Set chat ID to callback_query.message.chat.id ("{chat_id}")')
+        except AttributeError:
+            chat_id = update.effective_chat.id
+            self.logger.debug(f'Set chat ID to update.effective_chat.id ("{chat_id}")')
+        
+        try:
+            user_id = callback_query.from_user.id     # User who clicked "Play" # 
+            self.logger.debug(f'Set user ID to callback_query.from_user.id ("{user_id}")')
+        except AttributeError:
+            user_id = update.effective_user.id
+            self.logger.debug(f'Set user ID to update.effective_user.id ("{user_id}")')
 
-        url: str = f'{self._game_url}?user_id={update.effective_user.id}&chat_id={update.effective_chat.id}'
+        url: str = f'{self._game_url}?user_id={user_id}&chat_id={chat_id}'
 
         self.logger.debug(f'url: "{url}"')
 
