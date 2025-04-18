@@ -535,6 +535,7 @@
           1 + score * SPEED_INCREASE_RATE,
           MAX_SPEED_MULTIPLIER
         );
+        difficultyElement.textContent = currentSpeedMultiplier.toFixed(1) + "x";
 
         // Start timer with current speed
         timerInterval = setInterval(

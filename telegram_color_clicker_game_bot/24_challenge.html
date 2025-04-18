@@ -9,17 +9,23 @@
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
         margin: 0;
-        padding: 20px;
         min-height: 100vh;
         display: flex;
+        padding-left: 5px;
+        padding-right: 5px;
         flex-direction: column;
         align-items: center;
         color: #333;
       }
 
+      .title {
+        margin-top: -5px;
+      }
+
       .container {
         max-width: 600px;
-        width: 100%;
+        width: 90%;
+        margin-top: 5px;
         background-color: white;
         border-radius: 15px;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
@@ -46,8 +52,6 @@
       }
 
       .card {
-        width: 80px;
-        height: 120px;
         background: linear-gradient(145deg, #ffffff, #e6e9ed);
         border-radius: 10px;
         display: flex;
@@ -141,7 +145,7 @@
       }
 
       .expression {
-        min-height: 60px;
+        min-height: 40px;
         margin: 10px 0;
         padding: 15px;
         background-color: #f8f9fa;
@@ -228,13 +232,14 @@
           width: 50px;
           height: 50px;
           font-size: 20px;
+          padding: 0px;
         }
       }
     </style>
   </head>
   <body>
     <div class="container">
-      <h1>24 Challenge</h1>
+      <h1 class="title">24 Challenge</h1>
       <p class="subtitle">
         Use all four numbers with ➕, ➖, ✖️, ➗ to make 24.
       </p>
@@ -265,6 +270,8 @@
         <button class="operation" data-op="-">-</button>
         <button class="operation" data-op="×">×</button>
         <button class="operation" data-op="÷">÷</button>
+      </div>
+      <div class="operations">
         <button class="operation" data-op="(">(</button>
         <button class="operation" data-op=")">)</button>
         <button class="operation" id="backspace" data-op="backspace">⌫</button>
@@ -539,7 +546,7 @@
         let solved = false;
 
         // Game settings
-        const BASE_TIMER_SPEED = 450; // ms between updates (slower = faster timer)
+        const BASE_TIMER_SPEED = 600; // ms between updates (slower = faster timer)
         const MAX_SPEED_MULTIPLIER = 4; // Maximum speed increase
         const SPEED_INCREASE_RATE = 1.0 / 30.0; // How much speed increases per point
 
