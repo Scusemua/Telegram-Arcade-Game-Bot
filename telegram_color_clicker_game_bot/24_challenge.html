@@ -589,6 +589,9 @@
 
         function restart() {
             score = 0;
+            timerWidth = 100;
+            timerEl.style.width = `${timerWidth}%`;
+            timerEl.style.backgroundColor = "#FFC107";
             currentSpeedMultiplier = 1.0;
             newGame();
         }
