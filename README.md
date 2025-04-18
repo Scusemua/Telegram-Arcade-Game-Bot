@@ -1,4 +1,6 @@
-# 🎮 Color Match Telegram Game Bot
+# 🎮 Color Clicker Telegram Game Bot
+
+![logo](https://github.com/user-attachments/assets/979bc779-8047-474a-8d0e-32001e35d583)
 
 A simple Telegram-compatible HTML5 game where users must quickly click the rectangle that is correctly labeled with its color. Built using Python, Flask, and the Telegram Bot API.
 
