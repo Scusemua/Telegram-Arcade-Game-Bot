@@ -256,8 +256,6 @@
         <div class="card" data-number="">?</div>
       </div>
 
-      <!-- <button id="new-game">New Game</button> -->
-
       <div class="expression" id="expression"></div>
 
       <div class="operations">
@@ -273,6 +271,7 @@
 
       <div class="controls">
         <button id="check">Check</button>
+        <button id="new-game" style="display: none;">New Game</button>
         <!-- <button id="solution">Show Solution</button> -->
       </div>
 
@@ -549,7 +548,7 @@
         const cards = document.querySelectorAll(".card");
         const expressionEl = document.getElementById("expression");
         const messageEl = document.getElementById("message");
-        // const newGameBtn = document.getElementById("new-game");
+        const newGameBtn = document.getElementById("new-game");
         const checkBtn = document.getElementById("check");
         // const solutionBtn = document.getElementById("solution");
         const clearBtn = document.getElementById("clear");
@@ -564,7 +563,7 @@
         newGame();
 
         // Event listeners
-        // newGameBtn.addEventListener("click", newGame);
+        newGameBtn.addEventListener("click", restart);
         checkBtn.addEventListener("click", checkSolution);
         // solutionBtn.addEventListener("click", showSolution);
         clearBtn.addEventListener("click", clearExpression);
@@ -588,6 +587,12 @@
           return Math.floor(Math.random() * (max - min + 1) + min);
         }
 
+        function restart() {
+            score = 0;
+            currentSpeedMultiplier = 1.0;
+            newGame();
+        }
+
         // Game functions
         function newGame() {
           // Reset game state
@@ -604,6 +609,13 @@
           updateExpression();
           messageEl.className = "message";
           messageEl.textContent = "";
+
+          // Calculate timer speed based on score
+          currentSpeedMultiplier = Math.min(
+            1 + score * SPEED_INCREASE_RATE,
+            MAX_SPEED_MULTIPLIER
+          );
+          speedEl.textContent = currentSpeedMultiplier.toFixed(1) + "x";
 
           // Log solution for debugging (remove in production)
           console.log("Solution:", solution);
@@ -653,13 +665,6 @@
           console.log(`${currentDifficulty}: ${problem}`);
           shuffle(problem);
           difficultyEl.textContent = currentDifficulty;
-
-          // Calculate timer speed based on score
-          currentSpeedMultiplier = Math.min(
-            1 + score * SPEED_INCREASE_RATE,
-            MAX_SPEED_MULTIPLIER
-          );
-          speedEl.textContent = currentSpeedMultiplier.toFixed(1) + "x";
 
           // Start timer with current speed
           timerInterval = setInterval(
@@ -1060,6 +1065,7 @@
           const solSpan = document.createElement("span");
           solSpan.textContent = solution;
           expressionEl.appendChild(solSpan);
+          newGameBtn.style.display = "inline-block";
         }
 
         function updateExpression() {
