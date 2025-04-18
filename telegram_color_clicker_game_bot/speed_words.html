@@ -489,8 +489,6 @@
 
       // Check if word is valid
       async function isValidWord(word) {
-        if (word.length < currentSequence.length + 1) return false;
-
         // Check if word contains the sequence
         if (!word.toLowerCase().includes(currentSequence.toLowerCase())) {
           return false;
