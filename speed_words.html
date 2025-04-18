@@ -662,15 +662,15 @@
 
       // Check if word is valid
       async function isValidWord(word) {
-        // Check if word contains the sequence
-        if (!word.toLowerCase().includes(currentSequence.toLowerCase())) {
-          return false;
-        }
-
         const response = await fetch(
           `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
         );
         return response.ok;
+      }
+
+      function containsCurrentSequence(word) {
+        // Check if word contains the sequence
+        return word.toLowerCase().includes(currentSequence.toLowerCase());
       }
 
       function getRandomFloat(min, max) {
@@ -684,9 +684,10 @@
         if (!word) return;
 
         const isValid = await isValidWord(word);
+        const hasSequence = containsCurrentSequence(word);
         const isDuplicate = submitted.has(word);
 
-        if (isValid && !isDuplicate) {
+        if (isValid && hasSequence && !isDuplicate) {
           // Correct word
           score++;
           streak++;
@@ -742,8 +743,8 @@
           wordInput.value = "";
           nextSequence();
           wordInput.focus();
-        } else if (!isValid) {
-          // Incorrect word
+        } else if (!hasSequence) {
+          // Does not contain current sequence
           messageDisplay.textContent = "Word must contain the sequence!";
           messageDisplay.style.color = "#ff5252";
           streak = 0;
@@ -754,6 +755,14 @@
           // Duplicate word
           messageDisplay.textContent = `You've already entered "${word}"`;
           messageDisplay.style.color = "#ff5252";
+          updateDisplay();
+          wordInput.value = "";
+          wordInput.focus();
+        } else {
+          // Invalid word
+          messageDisplay.textContent = `Unknown or invalid word: ${word}`;
+          messageDisplay.style.color = "#ff5252";
+          streak = 0;
           updateDisplay();
           wordInput.value = "";
           wordInput.focus();
