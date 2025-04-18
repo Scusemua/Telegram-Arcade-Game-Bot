@@ -2,7 +2,7 @@
 
 This bot offers several different Telegram games.
 
-Try the games in your web browser [here]([https://scusemua.github.io/Telegram-Color-Clicker-Game-Bot/](https://scusemua.github.io/Telegram-Arcade-Game-Bot/)).
+Try the games in your web browser [here](https://scusemua.github.io/Telegram-Arcade-Game-Bot/).
 
 ## 🚀 Features
 
