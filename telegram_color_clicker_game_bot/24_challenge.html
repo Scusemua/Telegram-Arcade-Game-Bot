@@ -142,7 +142,7 @@
 
       .expression {
         min-height: 60px;
-        margin: 20px 0;
+        margin: 10px 0;
         padding: 15px;
         background-color: #f8f9fa;
         border-radius: 10px;
@@ -187,16 +187,30 @@
         display: block;
       }
 
+      .score {
+        font-size: 18px;
+        margin-bottom: 10px;
+        color: #666;
+      }
+
       .difficulty {
         font-size: 18px;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
+        color: #666;
+      }
+
+      .speed {
+        font-size: 18px;
+        margin-bottom: 10px;
         color: #666;
       }
 
       .timer {
-        font-size: 18px;
+        height: 10px;
+        background-color: #4caf50;
         margin-bottom: 20px;
-        color: #666;
+        border-radius: 5px;
+        transition: width 0.1s linear;
       }
 
       @media (max-width: 600px) {
@@ -221,13 +235,19 @@
   <body>
     <div class="container">
       <h1>24 Challenge</h1>
-      <p class="subtitle">Use all four numbers with ➕, ➖, ✖️, ➗ to make 24.</p>
+      <p class="subtitle">
+        Use all four numbers with ➕, ➖, ✖️, ➗ to make 24.
+      </p>
+
+      <div class="score"><b>🔥 Score:</b> <span id="score"></span></div>
 
       <div class="difficulty">
-        <b>Difficulty:</b> <span id="difficulty"></span>
+        <b>😫 Difficulty:</b> <span id="difficulty"></span>
       </div>
 
-      <div class="timer"><b>Time:</b> <span id="time">00:00</span></div>
+      <div class="speed"><b>🚀 Speed:</b> <span id="speed"></span></div>
+
+      <div class="timer" id="timer"></div>
 
       <div class="cards">
         <div class="card" data-number="">?</div>
@@ -236,7 +256,7 @@
         <div class="card" data-number="">?</div>
       </div>
 
-      <button id="new-game">New Game</button>
+      <!-- <button id="new-game">New Game</button> -->
 
       <div class="expression" id="expression"></div>
 
@@ -253,7 +273,7 @@
 
       <div class="controls">
         <button id="check">Check</button>
-        <button id="solution">Show Solution</button>
+        <!-- <button id="solution">Show Solution</button> -->
       </div>
 
       <div class="message" id="message"></div>
@@ -261,14 +281,6 @@
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-        // Game state
-        let numbers = [];
-        let usedNumbers = [];
-        let currentExpression = [];
-        let solution = "";
-        let startTime = null;
-        let timerInterval = null;
-
         const easy_problems = [
           [2, 2, 8, 6],
           [2, 2, 8, 6],
@@ -470,6 +482,24 @@
           [6, 3, 2, 7],
         ];
 
+        // Game state
+        let numbers = [];
+        let usedNumbers = [];
+        let currentExpression = [];
+        let solution = "";
+        let startTime = null;
+        let timerInterval = null;
+        let score = 0;
+        let currentSpeedMultiplier = 1.0;
+        let timerWidth = 100;
+        let nextRoundDelay = 2000;
+        let currentDifficulty = "";
+
+        // Game settings
+        const BASE_TIMER_SPEED = 300; // ms between updates (slower = faster timer)
+        const MAX_SPEED_MULTIPLIER = 4; // Maximum speed increase
+        const SPEED_INCREASE_RATE = 0.125; // How much speed increases per point
+
         const num_easy = easy_problems.length;
         const num_medium = medium_problems.length;
         const num_hard = hard_problems.length;
@@ -479,22 +509,24 @@
         const cards = document.querySelectorAll(".card");
         const expressionEl = document.getElementById("expression");
         const messageEl = document.getElementById("message");
-        const newGameBtn = document.getElementById("new-game");
+        // const newGameBtn = document.getElementById("new-game");
         const checkBtn = document.getElementById("check");
-        const solutionBtn = document.getElementById("solution");
+        // const solutionBtn = document.getElementById("solution");
         const clearBtn = document.getElementById("clear");
         const backspaceBtn = document.getElementById("backspace");
-        const timeEl = document.getElementById("time");
+        const timerEl = document.getElementById("timer");
+        const scoreEl = document.getElementById("score");
         const difficultyEl = document.getElementById("difficulty");
+        const speedEl = document.getElementById("speed");
         const operationBtns = document.querySelectorAll(".operation[data-op]");
 
         // Initialize game
         newGame();
 
         // Event listeners
-        newGameBtn.addEventListener("click", newGame);
+        // newGameBtn.addEventListener("click", newGame);
         checkBtn.addEventListener("click", checkSolution);
-        solutionBtn.addEventListener("click", showSolution);
+        // solutionBtn.addEventListener("click", showSolution);
         clearBtn.addEventListener("click", clearExpression);
         backspaceBtn.addEventListener("click", backspaceExpression);
 
@@ -519,11 +551,13 @@
         // Game functions
         function newGame() {
           // Reset game state
+          timerWidth = 100;
+          timerEl.style.width = `${timerWidth}%`;
           numbers = generateNumbers();
           usedNumbers = [];
           currentExpression = [];
           solution = findSolution(numbers);
-          startTimer();
+          scoreEl.textContent = score.toString();
 
           // Update UI
           updateCards();
@@ -559,23 +593,39 @@
 
         function generateNumbers() {
           const n = getRandomIntInclusive(0, num_problems);
-          let difficulty = "";
           let problem = [];
+          let difficultyMultiplier = 1.0;
 
           if (n <= num_easy) {
-            difficulty = "Easy";
+            currentDifficulty = "Easy";
             problem = getRandomElement(easy_problems);
+            difficultyMultiplier = 0.75;
           } else if (n <= num_medium) {
-            difficulty = "Medium";
+            currentDifficulty = "Medium";
             problem = getRandomElement(medium_problems);
+            difficultyMultiplier = 1.0;
           } else {
-            difficulty = "Hard";
+            currentDifficulty = "Hard";
             problem = getRandomElement(hard_problems);
+            difficultyMultiplier = 1.25;
           }
 
-          console.log(`${difficulty}: ${problem}`);
+          console.log(`${currentDifficulty}: ${problem}`);
           shuffle(problem);
-          difficultyEl.textContent = difficulty;
+          difficultyEl.textContent = currentDifficulty;
+
+          // Calculate timer speed based on score
+          currentSpeedMultiplier = Math.min(
+            1 + score * SPEED_INCREASE_RATE,
+            MAX_SPEED_MULTIPLIER
+          );
+          speedEl.textContent = currentSpeedMultiplier.toFixed(1) + "x";
+
+          // Start timer with current speed
+          timerInterval = setInterval(
+            updateTimer,
+            (BASE_TIMER_SPEED / currentSpeedMultiplier) * difficultyMultiplier
+          );
 
           return problem;
         }
@@ -601,18 +651,21 @@
           return "No solution found for these numbers. Try a new game!";
         }
 
-        function startTimer() {
-          if (timerInterval) clearInterval(timerInterval);
-          startTime = new Date();
-          timerInterval = setInterval(updateTimer, 1000);
-        }
-
         function updateTimer() {
-          const now = new Date();
-          const elapsed = new Date(now - startTime);
-          const minutes = String(elapsed.getMinutes()).padStart(2, "0");
-          const seconds = String(elapsed.getSeconds()).padStart(2, "0");
-          timeEl.textContent = `${minutes}:${seconds}`;
+          timerWidth -= 1;
+          timerEl.style.width = `${timerWidth}%`;
+
+          // Change color as time runs out
+          if (timerWidth < 30) {
+            timerEl.style.backgroundColor = "#f44336";
+          } else if (timerWidth < 60) {
+            timerEl.style.backgroundColor = "#FFC107";
+          }
+
+          if (timerWidth <= 0) {
+            clearInterval(timerInterval);
+            endGame("Time's up!");
+          }
         }
 
         function updateCards() {
@@ -625,11 +678,11 @@
 
         function selectNumber(card) {
           const number = card.dataset.number;
-          console.log(`Selected ${number}`);
+          console.log(`Selected ${number} from ${numbers}`);
 
           // Check if the number is already used
-          const usedCount = usedNumbers.filter((n) => n === number).length;
-          const totalCount = numbers.filter((n) => n === number).length;
+          const usedCount = usedNumbers.filter((n) => n == number).length;
+          const totalCount = numbers.filter((n) => n == number).length;
           console.log(`usedCount: ${usedCount}`);
           console.log(`totalCount: ${totalCount}`);
 
@@ -699,6 +752,10 @@
 
             if (item.type === "number") {
               usedNumbers.push(item.value);
+
+              if (usedNumbers.length == 4) {
+                checkSolution();
+              }
             }
           });
         }
@@ -748,7 +805,20 @@
             if (Math.abs(result - 24) < 0.0001) {
               // Allow for floating point precision
               showMessage("Congratulations! You solved it!", "success");
+
+              if (currentDifficulty === "Easy") {
+                score += 1;
+              } else if (currentDifficulty === "Medium") {
+                score += 2;
+              } else {
+                score += 3;
+              }
+
+              scoreEl.textContent = score.toString();
+
               clearInterval(timerInterval);
+
+              setTimeout(newGame, nextRoundDelay);
             } else {
               showMessage(`That equals ${result}, not 24. Try again!`, "error");
             }
