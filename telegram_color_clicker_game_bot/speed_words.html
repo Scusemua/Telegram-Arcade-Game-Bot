@@ -548,7 +548,7 @@
           messageDisplay.textContent = "Correct! +1 point";
           messageDisplay.style.color = "#4CAF50";
 
-          let increment = 1 + currentSpeedMultiplier;
+          let increment = 1 + currentSpeedMultiplier + Math.min(streak * 0.075, 5);
 
           if (currentSpeedMultiplier >= 1.5) {
             increment += getRandomFloat(0, currentSpeedMultiplier);
