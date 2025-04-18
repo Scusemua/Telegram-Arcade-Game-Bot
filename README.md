@@ -75,6 +75,10 @@ A simple Telegram-compatible HTML5 game where users must quickly click the recta
 - Click the correct one **before time runs out** to score a point!
 - A wrong click or timeout ends the game.
 
+## ⌨️ Speed Words
+
+You are shown a string of characters. You must quickly type an English word that contains those characters before the timer expires.
+
 ## ♾️ 24 Challenge / 24 Puzzle
 
 ### 🧠 Gameplay
