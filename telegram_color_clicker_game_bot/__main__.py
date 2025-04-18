@@ -111,7 +111,7 @@ class TelegramBot(object):
             json={
                 "user_id": user_id,
                 "score": score,
-                "force": True,  # Override previous score
+                # "force": True,  # Override previous score
             }
             
             if chat_id != "":
@@ -123,7 +123,7 @@ class TelegramBot(object):
                 json,
             )
             
-            self.logger.debug(f'Response from Telegram: {response}')
+            self.logger.debug(f'Response from Telegram: {response.json()}')
             return jsonify(response.json())
 
         @app.route("/game")
