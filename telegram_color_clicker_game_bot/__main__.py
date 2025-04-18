@@ -116,6 +116,8 @@ class TelegramBot(object):
             
             if chat_id != "":
                 json['chat_id'] = chat_id
+            
+            self.logger.debug(f"Sending request to Telegram: {json.dumps(json)}")
 
             # Call Telegram API
             response = requests.post(
