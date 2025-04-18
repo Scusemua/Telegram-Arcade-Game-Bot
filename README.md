@@ -34,8 +34,6 @@ A simple Telegram-compatible HTML5 game where users must quickly click the recta
 
 Try the game in your web browser [here](https://scusemua.github.io/Telegram-Color-Clicker-Game-Bot/).
 
----
-
 ### 🧠 Gameplay
 
 - Two colored rectangles are shown.
