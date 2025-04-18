@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>24 Puzzle Game</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        margin: 0;
+        padding: 20px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: #333;
+      }
+
+      .container {
+        max-width: 600px;
+        width: 100%;
+        background-color: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        text-align: center;
+      }
+
+      h1 {
+        color: #4a6fa5;
+        margin-bottom: 10px;
+      }
+
+      .subtitle {
+        color: #666;
+        margin-bottom: 30px;
+      }
+
+      .cards {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin: 30px 0;
+        flex-wrap: wrap;
+      }
+
+      .card {
+        width: 80px;
+        height: 120px;
+        background: linear-gradient(145deg, #ffffff, #e6e9ed);
+        border-radius: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 36px;
+        font-weight: bold;
+        color: #4a6fa5;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+      }
+
+      .card.selected {
+        background: linear-gradient(145deg, #ffd86f, #fc6262);
+        color: white;
+      }
+
+      .operations {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin: 20px 0;
+        flex-wrap: wrap;
+      }
+
+      .operation {
+        width: 60px;
+        height: 60px;
+        background-color: #4a6fa5;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 24px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .operation:hover {
+        background-color: #3a5a8f;
+        transform: scale(1.05);
+      }
+
+      .controls {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      button {
+        padding: 12px 25px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      #new-game {
+        background-color: #4a6fa5;
+        color: white;
+      }
+
+      #new-game:hover {
+        background-color: #3a5a8f;
+      }
+
+      #check {
+        background-color: #5cb85c;
+        color: white;
+      }
+
+      #check:hover {
+        background-color: #4cae4c;
+      }
+
+      #solution {
+        background-color: #f0ad4e;
+        color: white;
+      }
+
+      #solution:hover {
+        background-color: #eea236;
+      }
+
+      .expression {
+        min-height: 60px;
+        margin: 20px 0;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        font-size: 24px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+
+      .expression-item {
+        padding: 5px 10px;
+        border-radius: 5px;
+      }
+
+      .number {
+        background-color: #e3f2fd;
+      }
+
+      .operator {
+        background-color: #bbdefb;
+      }
+
+      .message {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 8px;
+        font-weight: bold;
+        display: none;
+      }
+
+      .success {
+        background-color: #dff0d8;
+        color: #3c763d;
+        display: block;
+      }
+
+      .error {
+        background-color: #f2dede;
+        color: #a94442;
+        display: block;
+      }
+
+      .timer {
+        font-size: 18px;
+        margin-bottom: 20px;
+        color: #666;
+      }
+
+      @media (max-width: 600px) {
+        .container {
+          padding: 20px;
+        }
+
+        .card {
+          width: 60px;
+          height: 90px;
+          font-size: 28px;
+        }
+
+        .operation {
+          width: 50px;
+          height: 50px;
+          font-size: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>24 Puzzle Game</h1>
+      <p class="subtitle">Use all four numbers with +, -, ×, ÷ to make 24</p>
+
+      <div class="timer">Time: <span id="time">00:00</span></div>
+
+      <div class="cards">
+        <div class="card" data-number="">?</div>
+        <div class="card" data-number="">?</div>
+        <div class="card" data-number="">?</div>
+        <div class="card" data-number="">?</div>
+      </div>
+
+      <button id="new-game">New Game</button>
+
+      <div class="expression" id="expression"></div>
+
+      <div class="operations">
+        <button class="operation" data-op="+">+</button>
+        <button class="operation" data-op="-">-</button>
+        <button class="operation" data-op="×">×</button>
+        <button class="operation" data-op="÷">÷</button>
+        <button class="operation" data-op="(">(</button>
+        <button class="operation" data-op=")">)</button>
+        <button class="operation" id="clear">C</button>
+      </div>
+
+      <div class="controls">
+        <button id="check">Check</button>
+        <button id="solution">Show Solution</button>
+      </div>
+
+      <div class="message" id="message"></div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Game state
+        let numbers = [];
+        let usedNumbers = [];
+        let currentExpression = [];
+        let solution = "";
+        let startTime = null;
+        let timerInterval = null;
+
+        // DOM elements
+        const cards = document.querySelectorAll(".card");
+        const expressionEl = document.getElementById("expression");
+        const messageEl = document.getElementById("message");
+        const newGameBtn = document.getElementById("new-game");
+        const checkBtn = document.getElementById("check");
+        const solutionBtn = document.getElementById("solution");
+        const clearBtn = document.getElementById("clear");
+        const timeEl = document.getElementById("time");
+        const operationBtns = document.querySelectorAll(".operation[data-op]");
+
+        // Initialize game
+        newGame();
+
+        // Event listeners
+        newGameBtn.addEventListener("click", newGame);
+        checkBtn.addEventListener("click", checkSolution);
+        solutionBtn.addEventListener("click", showSolution);
+        clearBtn.addEventListener("click", clearExpression);
+
+        cards.forEach((card) => {
+          card.addEventListener("click", () => selectNumber(card));
+        });
+
+        operationBtns.forEach((btn) => {
+          if (btn.id !== "clear") {
+            btn.addEventListener("click", () =>
+              addToExpression(btn.dataset.op, "operator")
+            );
+          }
+        });
+
+        // Game functions
+        function newGame() {
+          // Reset game state
+          numbers = generateNumbers();
+          usedNumbers = [];
+          currentExpression = [];
+          solution = findSolution(numbers);
+          startTimer();
+
+          // Update UI
+          updateCards();
+          updateExpression();
+          messageEl.className = "message";
+          messageEl.textContent = "";
+
+          // Log solution for debugging (remove in production)
+          console.log("Solution:", solution);
+        }
+
+        function generateNumbers() {
+          // Generate 4 random numbers between 1 and 9
+          // For better gameplay, we'll ensure there's at least one solution
+          const solvableGroups = [
+            [1, 3, 4, 6], // 6 / (1 - 3/4)
+            [1, 5, 5, 5], // (5 - 1/5) * 5
+            [2, 2, 6, 9], // (2 + 2) * (9 - 6)
+            [3, 3, 7, 7], // (3 + 3/7) * 7
+            [4, 4, 7, 7], // (7 - 4/7) * 4
+            [5, 5, 5, 1], // 5 * (5 - 1/5)
+            [6, 6, 6, 6], // 6 * 6 - 6 - 6
+            [8, 8, 3, 3], // 8 / (3 - 8/3)
+            [9, 9, 9, 9], // (9 + 9) + (9 - 9)
+          ];
+
+          // 50% chance to get a known solvable group
+          if (Math.random() > 0.5) {
+            const group =
+              solvableGroups[Math.floor(Math.random() * solvableGroups.length)];
+            return [...group].sort(() => Math.random() - 0.5); // Return shuffled
+          }
+
+          // Otherwise generate random numbers (might not be solvable)
+          const nums = [];
+          for (let i = 0; i < 4; i++) {
+            nums.push(Math.floor(Math.random() * 9) + 1);
+          }
+          return nums;
+        }
+
+        function findSolution(nums) {
+          // This is a simplified solver that checks common patterns
+          // A complete solver would need to check all permutations and operator combinations
+          const [a, b, c, d] = nums.sort((x, y) => x - y);
+
+          // Check some common patterns
+          if (a + b + c + d === 24) return `${a} + ${b} + ${c} + ${d}`;
+          if (a * b * c * d === 24) return `${a} × ${b} × ${c} × ${d}`;
+          if (a * b + c * d === 24) return `${a} × ${b} + ${c} × ${d}`;
+          if (a * b - c * d === 24) return `${a} × ${b} - ${c} × ${d}`;
+          if ((a + b) * (c - d) === 24) return `(${a} + ${b}) × (${c} - ${d})`;
+          if (a * b + c * d === 24) return `(${a} × ${b}) + (${c} × ${d})`;
+          if (a * b - c * d === 24) return `(${a} × ${b}) - (${c} × ${d})`;
+          if ((a + b + c) * d === 24) return `(${a} + ${b} + ${c}) × ${d}`;
+          if ((a + b) * c - d === 24) return `(${a} + ${b}) × ${c} - ${d}`;
+          if ((a + b) * c + d === 24) return `(${a} + ${b}) × ${c} + ${d}`;
+
+          // If no solution found, return a message
+          return "No solution found for these numbers. Try a new game!";
+        }
+
+        function startTimer() {
+          if (timerInterval) clearInterval(timerInterval);
+          startTime = new Date();
+          timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+          const now = new Date();
+          const elapsed = new Date(now - startTime);
+          const minutes = String(elapsed.getMinutes()).padStart(2, "0");
+          const seconds = String(elapsed.getSeconds()).padStart(2, "0");
+          timeEl.textContent = `${minutes}:${seconds}`;
+        }
+
+        function updateCards() {
+          cards.forEach((card, index) => {
+            card.textContent = numbers[index];
+            card.dataset.number = numbers[index];
+            card.classList.remove("selected");
+          });
+        }
+
+        function selectNumber(card) {
+          const number = card.dataset.number;
+          console.log(`Selected ${number}`);
+
+          // Check if the number is already used
+          const usedCount = usedNumbers.filter((n) => n === number).length;
+          const totalCount = numbers.filter((n) => n === number).length;
+          console.log(`usedCount: ${usedCount}`);
+          console.log(`totalCount: ${totalCount}`);
+
+          if (usedCount > 0 && usedCount >= totalCount) {
+            showMessage(`You've already used all ${number}s`, "error");
+            return;
+          }
+
+          // Add to expression
+          addToExpression(number, "number");
+
+          // Visual feedback
+          card.classList.add("selected");
+          setTimeout(() => card.classList.remove("selected"), 300);
+        }
+
+        function addToExpression(value, type) {
+          currentExpression.push({ value, type });
+          updateExpression();
+        }
+
+        function clearExpression() {
+          currentExpression = [];
+          usedNumbers = [];
+          updateExpression();
+          messageEl.className = "message";
+          messageEl.textContent = "";
+        }
+
+        function updateExpression() {
+          expressionEl.innerHTML = "";
+          usedNumbers = [];
+
+          currentExpression.forEach((item) => {
+            const span = document.createElement("span");
+            span.textContent = item.value;
+            span.className = `expression-item ${item.type}`;
+            expressionEl.appendChild(span);
+
+            if (item.type === "number") {
+              usedNumbers.push(item.value);
+            }
+          });
+        }
+
+        function checkSolution() {
+          try {
+            // Convert the expression to a computable string
+            let expr = currentExpression.map((item) => item.value).join(" ");
+
+            // Replace × with * and ÷ with / for evaluation
+            expr = expr.replace(/×/g, "*").replace(/÷/g, "/");
+
+            // Check if all numbers are used
+            const usedAllNumbers = numbers.every((num) => {
+              const countInNumbers = numbers.filter((n) => n == num).length;
+              const countInUsed = usedNumbers.filter((n) => n == num).length;
+              return countInUsed === countInNumbers;
+            });
+
+            if (!usedAllNumbers) {
+              showMessage(
+                "You must use all four numbers exactly once!",
+                "error"
+              );
+              return;
+            }
+
+            // Check if the expression is valid
+            if (expr.length === 0) {
+              showMessage("Please enter an expression", "error");
+              return;
+            }
+
+            // Check for balanced parentheses
+            if (
+              (expr.match(/\(/g) || []).length !==
+              (expr.match(/\)/g) || []).length
+            ) {
+              showMessage("Unbalanced parentheses", "error");
+              return;
+            }
+
+            // Evaluate the expression
+            const result = eval(expr);
+
+            // Check if the result is 24
+            if (Math.abs(result - 24) < 0.0001) {
+              // Allow for floating point precision
+              showMessage("Congratulations! You solved it!", "success");
+              clearInterval(timerInterval);
+            } else {
+              showMessage(`That equals ${result}, not 24. Try again!`, "error");
+            }
+          } catch (e) {
+            showMessage(
+              "Invalid expression. Please check your input.",
+              "error"
+            );
+          }
+        }
+
+        function showSolution() {
+          showMessage(`Solution: ${solution}`, "success");
+          clearInterval(timerInterval);
+        }
+
+        function showMessage(text, type) {
+          messageEl.className = "message " + type;
+          messageEl.textContent = text;
+        }
+      });
+    </script>
+  </body>
+</html>

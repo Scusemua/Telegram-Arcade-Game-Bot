@@ -3,7 +3,7 @@ import logging
 import requests
 from uuid import uuid4
 from typing import Dict, Any
-from flask import Flask, send_from_directory, jsonify
+from flask import Flask, send_from_directory, jsonify, abort
 from telegram import InlineQueryResultGame, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, CallbackQueryHandler, InlineQueryHandler, ApplicationBuilder
 
@@ -202,9 +202,14 @@ class TelegramBot(object):
             self.logger.debug(f'Response from Telegram: {response.json()}')
             return jsonify(response.json())
 
-        @app.route("/game")
-        def serve_game():
-            return send_from_directory(".", "game.html")
+        @app.route("/game/<game_name>")
+        def serve_game(game_name):
+            if game_name == "color_clicker":
+                return send_from_directory(".", "color_clicker.html")
+            elif game_name == "24_challenge":
+                return send_from_directory(".", "24_challenge.html")
+            
+            abort(code=400, args=f'Invalid game: "{game_name}"')
 
         app.run(host="0.0.0.0", port=self._http_port,
                 debug=False, use_reloader=False)
