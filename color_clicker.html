@@ -101,7 +101,23 @@
       }
 
       .start-btn:hover {
-        background-color: #45a049;
+        background-color: rgb(9, 53, 11);
+      }
+
+      .go-back-btn {
+        background-color: #4c93af;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 20px;
+        text-decoration: none;
+      }
+
+      .go-back-btn:hover {
+        background-color: #3b8eaf;
       }
 
       .difficulty {
@@ -182,7 +198,9 @@
 
       <div class="score-container">
         <div class="score-box">Score: <span id="score">0</span></div>
-        <div class="score-box">Personal Best: <span id="highScore">0</span></div>
+        <div class="score-box">
+          Personal Best: <span id="highScore">0</span>
+        </div>
       </div>
       <div class="difficulty">🚀 Speed: <span id="difficulty">1x</span></div>
       <div class="timer" id="timer"></div>
@@ -194,10 +212,7 @@
       <div class="message" id="message"></div>
 
       <button class="start-btn" id="startBtn">Start Game</button>
-      <!-- <button class="start-btn" id="leaderboardBtn">Leaderboard</button> -->
-      <!-- <button class="start-btn" id="shareBtn" style="display: none">
-        Share
-      </button> -->
+      <a href="index.html" class="go-back-btn">Go Back</a>
 
       <!-- <div class="leaderboard" id="leaderboard">
         <h3>Top Players</h3>
