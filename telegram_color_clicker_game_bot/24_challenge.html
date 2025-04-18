@@ -482,6 +482,12 @@
           [6, 3, 2, 7],
         ];
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get("user_id"); // e.g., "12345"
+        const chatId = urlParams.get("chat_id"); // Optional
+        const messageId = urlParams.get("message_id"); // Optional
+        const inlineMessageId = urlParams.get("inline_message_id"); // Optional
+
         const permvar = new Array(24);
 
         permvar[0] = new Array("w", "x", "y", "z");
@@ -926,6 +932,32 @@
 
         function endGame() {
           setGameOver();
+
+          // POST request
+          const data = {
+            score: score,
+            user_id: userId,
+            chat_id: chatId,
+            message_id: messageId,
+            inline_message_id: inlineMessageId,
+          };
+
+          fetch("/api/data", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (responseElement) {
+                responseElement.textContent = JSON.stringify(data);
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+            });
         }
 
         function updateTimer() {
@@ -1026,7 +1058,7 @@
           const br = document.createElement("br");
           expressionEl.appendChild(br);
           const solSpan = document.createElement("span");
-          solSpan.textContent=solution;
+          solSpan.textContent = solution;
           expressionEl.appendChild(solSpan);
         }
 
