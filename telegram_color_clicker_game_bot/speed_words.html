@@ -79,7 +79,7 @@
         background-color: rgba(255, 255, 255, 0.1);
         padding: 15px;
         border-radius: 10px;
-        min-width: 100px;
+        min-width: 75px;
       }
 
       .stat-value {
@@ -433,17 +433,17 @@
           });
       }
 
-        // Show correct answer after delay
-        // setTimeout(() => {
-        //     if (gameActive) {
-        //         nextSequence();
-        //         wordInput.disabled = false;
-        //         wordInput.value = '';
-        //         wordInput.focus();
-        //         startTimer();
-        //     }
-        // }, 1500);
-      }
+      // Show correct answer after delay
+      // setTimeout(() => {
+      //     if (gameActive) {
+      //         nextSequence();
+      //         wordInput.disabled = false;
+      //         wordInput.value = '';
+      //         wordInput.focus();
+      //         startTimer();
+      //     }
+      // }, 1500);
+      // }
 
       // Check if word is valid
       function isValidWord(word) {
@@ -486,7 +486,7 @@
           messageDisplay.style.color = "#4CAF50";
 
           let increment = 2;
-          increment = increment * Math.min(currentSpeedMultiplier * 0.75, 1.0)
+          increment = increment * Math.min(currentSpeedMultiplier * 0.75, 1.0);
 
           // Extra time for quick responses
           timeLeft = Math.min(100, timeLeft + increment);
