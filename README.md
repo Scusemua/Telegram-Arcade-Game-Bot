@@ -2,6 +2,8 @@
 
 This bot offers several different Telegram games.
 
+Try the games in your web browser [here]([https://scusemua.github.io/Telegram-Color-Clicker-Game-Bot/](https://scusemua.github.io/Telegram-Arcade-Game-Bot/)).
+
 ## 🚀 Features
 
 - HTML5 game served via Flask
@@ -31,8 +33,6 @@ As of right now, there are two games offered by the Telegram Arcade Bot.
 ## 🎨 Color Clicker
 
 A simple Telegram-compatible HTML5 game where users must quickly click the rectangle that is correctly labeled with its color. Built using Python, Flask, and the Telegram Bot API.
-
-Try the game in your web browser [here](https://scusemua.github.io/Telegram-Color-Clicker-Game-Bot/).
 
 ### 🧠 Gameplay
 
