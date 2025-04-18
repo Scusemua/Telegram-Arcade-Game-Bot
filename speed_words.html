@@ -301,39 +301,6 @@
     </div>
 
     <script>
-      // Get the user ID from the URL
-      const urlParams = new URLSearchParams(window.location.search);
-      const userId = urlParams.get("user_id"); // e.g., "12345"
-      const chatId = urlParams.get("chat_id"); // Optional
-      const messageId = urlParams.get("message_id"); // Optional
-      const inlineMessageId = urlParams.get("inline_message_id"); // Optional
-
-      // Close tooltip when clicking anywhere else on the page
-      document.addEventListener("click", function (event) {
-        if (!event.target.closest(".info-button")) {
-          document.querySelectorAll(".info-button").forEach((button) => {
-            button.classList.remove("active");
-          });
-        }
-      });
-
-      // Game settings
-      const BASE_TIMER_SPEED = 300; // ms between updates (slower = faster timer)
-      const MAX_SPEED_MULTIPLIER = 2; // Maximum speed increase
-      const SPEED_INCREASE_RATE = 0.025; // How much speed increases per point
-      const MULTIPLIER_DECIMALS = 3;
-
-      // Game variables
-      let currentSpeedMultiplier = 1.0;
-      let score = 0;
-      let streak = 0;
-      let timeLeft = 0;
-      let timer;
-      let currentSequence = "";
-      let previousSequeqnce = "";
-      let gameActive = false;
-      let submitted = new Set();
-
       // Common letter sequences with many possible words
       const sequences = [
         "ing",
@@ -492,6 +459,45 @@
         "wi",
         "yo",
       ];
+
+      // Get the user ID from the URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const userId = urlParams.get("user_id"); // e.g., "12345"
+      const chatId = urlParams.get("chat_id"); // Optional
+      const messageId = urlParams.get("message_id"); // Optional
+      const inlineMessageId = urlParams.get("inline_message_id"); // Optional
+
+      // Close tooltip when clicking anywhere else on the page
+      document.addEventListener("click", function (event) {
+        if (!event.target.closest(".info-button")) {
+          document.querySelectorAll(".info-button").forEach((button) => {
+            button.classList.remove("active");
+          });
+        }
+      });
+
+      let isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+      // Game settings
+      let BASE_TIMER_SPEED = 300; // ms between updates (lower = faster timer)
+      if (isMobile) {
+        BASE_TIMER_SPEED = 500; // Harder to type on a phone...
+      }
+
+      const MAX_SPEED_MULTIPLIER = 2; // Maximum speed increase
+      const SPEED_INCREASE_RATE = 0.025; // How much speed increases per point
+      const MULTIPLIER_DECIMALS = 3;
+
+      // Game variables
+      let currentSpeedMultiplier = 1.0;
+      let score = 0;
+      let streak = 0;
+      let timeLeft = 0;
+      let timer;
+      let currentSequence = "";
+      let previousSequeqnce = "";
+      let gameActive = false;
+      let submitted = new Set();
 
       // DOM elements
       const sequenceDisplay = document.getElementById("sequence");
