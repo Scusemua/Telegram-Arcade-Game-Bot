@@ -513,6 +513,10 @@
         return true;
       }
 
+      function getRandomFloat(min, max) {
+        return Math.random() * (max - min) + min;
+      }
+
       // Handle word submission
       function checkWord() {
         const word = wordInput.value.trim().toLowerCase();
@@ -527,7 +531,7 @@
           score++;
           streak++;
 
-          submitted.add(word)
+          submitted.add(word);
 
           // Reset timer
           clearInterval(timer);
@@ -544,8 +548,11 @@
           messageDisplay.textContent = "Correct! +1 point";
           messageDisplay.style.color = "#4CAF50";
 
-          let increment = 2;
-          increment = increment * Math.min(currentSpeedMultiplier * 0.75, 1.0);
+          let increment = 1 + currentSpeedMultiplier;
+
+          if (currentSpeedMultiplier >= 1.5) {
+            increment += getRandomFloat(0, currentSpeedMultiplier);
+          }
 
           // Extra time for quick responses
           timeLeft = Math.min(100, timeLeft + increment);
