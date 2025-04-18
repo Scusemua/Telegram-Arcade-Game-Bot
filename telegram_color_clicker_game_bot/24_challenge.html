@@ -664,7 +664,7 @@
           // Start timer with current speed
           timerInterval = setInterval(
             updateTimer,
-            1 // (BASE_TIMER_SPEED / currentSpeedMultiplier) * difficultyMultiplier
+            (BASE_TIMER_SPEED / currentSpeedMultiplier) * difficultyMultiplier
           );
 
           return problem;
