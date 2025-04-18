@@ -482,6 +482,40 @@
           [6, 3, 2, 7],
         ];
 
+        const permvar = new Array(24);
+
+        permvar[0] = new Array("w", "x", "y", "z");
+        permvar[1] = new Array("w", "x", "z", "y");
+        permvar[2] = new Array("w", "y", "x", "z");
+        permvar[3] = new Array("w", "y", "z", "x");
+
+        permvar[4] = new Array("w", "z", "x", "y");
+        permvar[5] = new Array("w", "z", "y", "x");
+        permvar[6] = new Array("x", "w", "y", "z");
+        permvar[7] = new Array("x", "w", "z", "y");
+
+        permvar[8] = new Array("x", "y", "w", "z");
+        permvar[9] = new Array("x", "y", "z", "w");
+        permvar[10] = new Array("x", "z", "w", "y");
+        permvar[11] = new Array("x", "z", "y", "w");
+
+        permvar[12] = new Array("y", "w", "x", "z");
+        permvar[13] = new Array("y", "w", "z", "x");
+        permvar[14] = new Array("y", "x", "w", "z");
+        permvar[15] = new Array("y", "x", "z", "w");
+
+        permvar[16] = new Array("y", "z", "w", "x");
+        permvar[17] = new Array("y", "z", "x", "w");
+        permvar[18] = new Array("z", "w", "x", "y");
+        permvar[19] = new Array("z", "w", "y", "x");
+
+        permvar[20] = new Array("z", "x", "w", "y");
+        permvar[21] = new Array("z", "x", "y", "w");
+        permvar[22] = new Array("z", "y", "w", "x");
+        permvar[23] = new Array("z", "y", "x", "w");
+
+        var op = new Array("*", "+", "/", "-");
+
         // Game state
         let numbers = [];
         let usedNumbers = [];
@@ -624,31 +658,274 @@
           // Start timer with current speed
           timerInterval = setInterval(
             updateTimer,
-            (BASE_TIMER_SPEED / currentSpeedMultiplier) * difficultyMultiplier
+            1 // (BASE_TIMER_SPEED / currentSpeedMultiplier) * difficultyMultiplier
           );
 
           return problem;
         }
 
+        // function findSolution(nums) {
+        //   // This is a simplified solver that checks common patterns
+        //   // A complete solver would need to check all permutations and operator combinations
+        //   const [a, b, c, d] = nums.sort((x, y) => x - y);
+
+        //   // Check some common patterns
+        //   if (a + b + c + d === 24) return `${a} + ${b} + ${c} + ${d}`;
+        //   if (a * b * c * d === 24) return `${a} × ${b} × ${c} × ${d}`;
+        //   if (a * b + c * d === 24) return `${a} × ${b} + ${c} × ${d}`;
+        //   if (a * b - c * d === 24) return `${a} × ${b} - ${c} × ${d}`;
+        //   if ((a + b) * (c - d) === 24) return `(${a} + ${b}) × (${c} - ${d})`;
+        //   if (a * b + c * d === 24) return `(${a} × ${b}) + (${c} × ${d})`;
+        //   if (a * b - c * d === 24) return `(${a} × ${b}) - (${c} × ${d})`;
+        //   if ((a + b + c) * d === 24) return `(${a} + ${b} + ${c}) × ${d}`;
+        //   if ((a + b) * c - d === 24) return `(${a} + ${b}) × ${c} - ${d}`;
+        //   if ((a + b) * c + d === 24) return `(${a} + ${b}) × ${c} + ${d}`;
+
+        //   // If no solution found, return a message
+        //   return "No solution found for these numbers. Try a new game!";
+        // }
+
         function findSolution(nums) {
-          // This is a simplified solver that checks common patterns
-          // A complete solver would need to check all permutations and operator combinations
-          const [a, b, c, d] = nums.sort((x, y) => x - y);
+          var w = nums[0];
+          var x = nums[1];
+          var y = nums[2];
+          var z = nums[3];
 
-          // Check some common patterns
-          if (a + b + c + d === 24) return `${a} + ${b} + ${c} + ${d}`;
-          if (a * b * c * d === 24) return `${a} × ${b} × ${c} × ${d}`;
-          if (a * b + c * d === 24) return `${a} × ${b} + ${c} × ${d}`;
-          if (a * b - c * d === 24) return `${a} × ${b} - ${c} × ${d}`;
-          if ((a + b) * (c - d) === 24) return `(${a} + ${b}) × (${c} - ${d})`;
-          if (a * b + c * d === 24) return `(${a} × ${b}) + (${c} × ${d})`;
-          if (a * b - c * d === 24) return `(${a} × ${b}) - (${c} × ${d})`;
-          if ((a + b + c) * d === 24) return `(${a} + ${b} + ${c}) × ${d}`;
-          if ((a + b) * c - d === 24) return `(${a} + ${b}) × ${c} - ${d}`;
-          if ((a + b) * c + d === 24) return `(${a} + ${b}) × ${c} + ${d}`;
+          var sol = swap(w, x, y, z);
 
-          // If no solution found, return a message
-          return "No solution found for these numbers. Try a new game!";
+          sol = replace(sol[0], w, x, y, z);
+
+          if (sol == "no solution found.") {
+            return sol;
+          } else {
+            return sol + " = 24";
+          }
+
+          return sol;
+        }
+
+        function replace(sol, w, x, y, z) {
+          sol = sol.replace("x", x);
+          sol = sol.replace("y", y);
+          sol = sol.replace("w", w);
+          sol = sol.replace("z", z);
+
+          sol = sol.replace("*", "×");
+          sol = sol.replace("/", "÷");
+          sol = sol.replace("-", "-");
+          sol = sol.replace("+", "+");
+
+          return sol;
+        }
+
+        function swap(w, x, y, z) {
+          var op1, op2, op3;
+          dummy = "";
+
+          for (i = 0; i < 24; i++) {
+            for (j = 0; j < 4; j++) {
+              op1 = op[j];
+              for (k = 0; k < 4; k++) {
+                op2 = op[k];
+                for (l = 0; l < 4; l++) {
+                  op3 = op[l];
+                  fu =
+                    permvar[i][0] +
+                    op1 +
+                    permvar[i][1] +
+                    op2 +
+                    permvar[i][2] +
+                    op3 +
+                    permvar[i][3];
+                  dummy += "<br/>" + replace(fu, w, x, y, z);
+                  if (f(w, x, y, z, fu) == 24) {
+                    return [fu, dummy];
+                  }
+
+                  fu =
+                    "(" +
+                    permvar[i][0] +
+                    op1 +
+                    permvar[i][1] +
+                    ")" +
+                    op2 +
+                    permvar[i][2] +
+                    op3 +
+                    permvar[i][3];
+                  dummy += "<br/>" + replace(fu, w, x, y, z);
+                  if (f(w, x, y, z, fu) == 24) {
+                    return [fu, dummy];
+                  }
+
+                  fu =
+                    permvar[i][0] +
+                    op1 +
+                    "(" +
+                    permvar[i][1] +
+                    op2 +
+                    permvar[i][2] +
+                    ")" +
+                    op3 +
+                    permvar[i][3];
+                  dummy += "<br/>" + replace(fu, w, x, y, z);
+                  if (f(w, x, y, z, fu) == 24) {
+                    return [fu, dummy];
+                  }
+
+                  fu =
+                    permvar[i][0] +
+                    op1 +
+                    permvar[i][1] +
+                    op2 +
+                    "(" +
+                    permvar[i][2] +
+                    op3 +
+                    permvar[i][3] +
+                    ")";
+                  dummy += "<br/>" + replace(fu, w, x, y, z);
+                  if (f(w, x, y, z, fu) == 24) {
+                    return [fu, dummy];
+                  }
+
+                  fu =
+                    "(" +
+                    permvar[i][0] +
+                    op1 +
+                    permvar[i][1] +
+                    ")" +
+                    op2 +
+                    "(" +
+                    permvar[i][2] +
+                    op3 +
+                    permvar[i][3] +
+                    ")";
+                  dummy += "<br/>" + replace(fu, w, x, y, z);
+                  if (f(w, x, y, z, fu) == 24) {
+                    return [fu, dummy];
+                  }
+
+                  fu =
+                    "(" +
+                    permvar[i][0] +
+                    op1 +
+                    permvar[i][1] +
+                    op2 +
+                    permvar[i][2] +
+                    ")" +
+                    op3 +
+                    permvar[i][3];
+                  dummy += "<br/>" + replace(fu, w, x, y, z);
+                  if (f(w, x, y, z, fu) == 24) {
+                    return [fu, dummy];
+                  }
+
+                  fu =
+                    permvar[i][0] +
+                    op1 +
+                    "(" +
+                    permvar[i][1] +
+                    op2 +
+                    permvar[i][2] +
+                    op3 +
+                    permvar[i][3] +
+                    ")";
+                  dummy += "<br/>" + replace(fu, w, x, y, z);
+                  if (f(w, x, y, z, fu) == 24) {
+                    return [fu, dummy];
+                  }
+
+                  fu =
+                    "(" +
+                    "(" +
+                    permvar[i][0] +
+                    op1 +
+                    permvar[i][1] +
+                    ")" +
+                    op2 +
+                    permvar[i][2] +
+                    ")" +
+                    op3 +
+                    permvar[i][3];
+                  dummy += "<br/>" + replace(fu, w, x, y, z);
+                  if (f(w, x, y, z, fu) == 24) {
+                    return [fu, dummy];
+                  }
+
+                  fu =
+                    permvar[i][0] +
+                    op1 +
+                    "(" +
+                    "(" +
+                    permvar[i][1] +
+                    op2 +
+                    permvar[i][2] +
+                    ")" +
+                    op3 +
+                    permvar[i][3] +
+                    ")";
+                  dummy += "<br/>" + replace(fu, w, x, y, z);
+                  if (f(w, x, y, z, fu) == 24) {
+                    return [fu, dummy];
+                  }
+
+                  fu =
+                    "(" +
+                    permvar[i][0] +
+                    op1 +
+                    "(" +
+                    permvar[i][1] +
+                    op2 +
+                    permvar[i][2] +
+                    ")" +
+                    ")" +
+                    op3 +
+                    permvar[i][3];
+                  dummy += "<br/>" + replace(fu, w, x, y, z);
+                  if (f(w, x, y, z, fu) == 24) {
+                    return [fu, dummy];
+                  }
+
+                  fu =
+                    permvar[i][0] +
+                    op1 +
+                    "(" +
+                    permvar[i][1] +
+                    op2 +
+                    "(" +
+                    permvar[i][2] +
+                    op3 +
+                    permvar[i][3] +
+                    ")" +
+                    ")";
+                  dummy += "<br/>" + replace(fu, w, x, y, z);
+                  if (f(w, x, y, z, fu) == 24) {
+                    return [fu, dummy];
+                  }
+                }
+              }
+            }
+          }
+
+          return ["no solution found.", dummy];
+        }
+
+        function $(e) {
+          return document.getElementById(e);
+        }
+
+        function f(w, x, y, z, fu) {
+          var myfunction = new Function(
+            "w",
+            "x",
+            "y",
+            "z",
+            "return " + fu + ";"
+          );
+          return myfunction(w, x, y, z, fu);
+        }
+
+        function endGame() {
+          setGameOver();
         }
 
         function updateTimer() {
@@ -738,6 +1015,19 @@
           updateExpression();
           messageEl.className = "message";
           messageEl.textContent = "";
+        }
+
+        function setGameOver() {
+          expressionEl.innerHTML = "";
+          const span = document.createElement("span");
+          const solution = findSolution(numbers);
+          span.textContent = "Game Over! One possible solution is: ";
+          expressionEl.appendChild(span);
+          const br = document.createElement("br");
+          expressionEl.appendChild(br);
+          const solSpan = document.createElement("span");
+          solSpan.textContent=solution;
+          expressionEl.appendChild(solSpan);
         }
 
         function updateExpression() {
