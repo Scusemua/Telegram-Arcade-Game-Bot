@@ -59,7 +59,9 @@ class TelegramBot(object):
     async def inline_query(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         results = [
             InlineQueryResultGame(
-                id=str(uuid4()), game_short_name=COLOR_CLICKER_SHORT_NAME)
+                id=str(uuid4()), game_short_name=COLOR_CLICKER_SHORT_NAME),
+            InlineQueryResultGame(
+                id=str(uuid4()), game_short_name=CHALLENGE_24_SHORT_NAME)
         ]
         await update.inline_query.answer(results, cache_time=0)
 
