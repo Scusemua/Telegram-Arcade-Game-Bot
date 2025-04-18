@@ -533,6 +533,7 @@
         let timerWidth = 100;
         let nextRoundDelay = 2000;
         let currentDifficulty = "";
+        let solved = false;
 
         // Game settings
         const BASE_TIMER_SPEED = 300; // ms between updates (slower = faster timer)
@@ -596,8 +597,20 @@
           newGame();
         }
 
+        function nextRound() {
+          // Calculate timer speed based on score
+          currentSpeedMultiplier = Math.min(
+            currentSpeedMultiplier + SPEED_INCREASE_RATE,
+            MAX_SPEED_MULTIPLIER
+          );
+
+          newGame();
+        }
+
         // Game functions
         function newGame() {
+          solved = false;
+
           // Reset game state
           timerWidth = 100;
           timerEl.style.width = `${timerWidth}%`;
@@ -1089,6 +1102,10 @@
         }
 
         function checkSolution() {
+          if (solved) {
+            return;
+          }
+
           try {
             // Convert the expression to a computable string
             let expr = currentExpression.map((item) => item.value).join(" ");
@@ -1146,13 +1163,9 @@
 
               clearInterval(timerInterval);
 
-              // Calculate timer speed based on score
-              currentSpeedMultiplier = Math.min(
-                currentSpeedMultiplier + SPEED_INCREASE_RATE,
-                MAX_SPEED_MULTIPLIER
-              );
+              solved = true;
 
-              setTimeout(newGame, nextRoundDelay);
+              setTimeout(nextRound, nextRoundDelay);
             } else {
               showMessage(`That equals ${result}, not 24. Try again!`, "error");
             }
