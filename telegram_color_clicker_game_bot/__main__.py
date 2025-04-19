@@ -25,7 +25,7 @@ def main():
     parser.add_argument("-l", "--log-file", type=str, default="telegram_bot.log",
                         help="Path for log file. If the empty string is specified, then logs will only be written to stdout.")
     parser.add_argument("-g", "--game-url", type=str,
-                        default="https://scusemua.github.io/Telegram-Color-Clicker-Game-Bot/", help="Public IPv4 of the game.")
+                        default="", help="Public IPv4 of the game.")
     parser.add_argument("--port", type=int, default=8082, help="HTTP port.")
     parser.add_argument("--run-http-server", action='store_true',
                         help="If true, then run HTTP backend server.")
