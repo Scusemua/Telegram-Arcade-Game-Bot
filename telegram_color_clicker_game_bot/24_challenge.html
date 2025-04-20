@@ -586,7 +586,7 @@
         // Event listeners
         newGameBtn.addEventListener("click", restart);
         giveUpBtn.addEventListener("click", giveUp);
-        checkBtn.addEventListener("click", checkSolution);
+        checkBtn.addEventListener("click", onCheckSolutionClicked);
         // solutionBtn.addEventListener("click", showSolution);
         clearBtn.addEventListener("click", clearExpression);
         backspaceBtn.addEventListener("click", backspaceExpression);
@@ -1142,6 +1142,10 @@
               }
             }
           });
+        }
+
+        function onCheckSolutionClicked() {
+          checkSolution(currentExpression);
         }
 
         function checkSolution(expressionToCheck) {
