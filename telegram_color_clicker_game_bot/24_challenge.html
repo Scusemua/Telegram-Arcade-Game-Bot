@@ -1135,8 +1135,9 @@
               if (usedNumbers.length == 4) {
                 let correct = checkSolution(currentExpression);
 
+                // Try adding the final closing parenthesis automatically.
                 if (!correct) {
-                  checkSolution(currentExpression + ")");
+                  checkSolution(currentExpression + [")"]);
                 }
               }
             }
