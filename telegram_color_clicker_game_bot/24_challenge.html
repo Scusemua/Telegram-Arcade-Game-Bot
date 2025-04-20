@@ -1155,7 +1155,7 @@
 
           try {
             // Convert the expression to a computable string
-            let expr = currentExpression.map((item) => item.value).join(" ");
+            let expr = expressionToCheck.map((item) => item.value).join(" ");
 
             // Replace × with * and ÷ with / for evaluation
             expr = expr.replace(/×/g, "*").replace(/÷/g, "/");
