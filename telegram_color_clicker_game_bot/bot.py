@@ -132,7 +132,7 @@ class TelegramBot(object):
         )
 
     def run_http_server(self):
-        app = Flask(__name__)
+        app = Flask(__name__, static_url_path = "/static")
         CORS(app)  # Allow all origins
         
         @app.route('/api/highscores', methods=['GET'])
