@@ -216,6 +216,10 @@ class TelegramBot(object):
 
             self.logger.debug(f'Response from Telegram: {response.json()}')
             return jsonify(response.json())
+        
+        @app.route("/games")
+        def serve_games():
+            return send_from_directory(".", "index.html")
 
         @app.route("/game/<game_name>")
         def serve_game(game_name):
