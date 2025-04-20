@@ -1191,15 +1191,15 @@
 
               if (currentDifficulty === "Easy") {
                 score += 1;
-                completed_easy.add(easy_problems[currentProblemIndex]);
+                completed_easy.push(easy_problems[currentProblemIndex]);
                 easy_problems.splice(currentProblemIndex, 1);
               } else if (currentDifficulty === "Medium") {
                 score += 2;
-                completed_medium.add(medium_problems[currentProblemIndex]);
+                completed_medium.push(medium_problems[currentProblemIndex]);
                 medium_problems.splice(currentProblemIndex, 1);
               } else {
                 score += 3;
-                completed_hard.add(hard_problems[currentProblemIndex]);
+                completed_hard.push(hard_problems[currentProblemIndex]);
                 hard_problems.splice(currentProblemIndex, 1);
               }
 
