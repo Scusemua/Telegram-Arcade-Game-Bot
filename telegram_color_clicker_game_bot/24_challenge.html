@@ -1133,15 +1133,23 @@
               usedNumbers.push(item.value);
 
               if (usedNumbers.length == 4) {
-                checkSolution();
+                let correct = checkSolution(currentExpression);
+
+                if (!correct) {
+                  checkSolution(currentExpression + ")");
+                }
               }
             }
           });
         }
 
-        function checkSolution() {
+        function checkSolution(expressionToCheck) {
           if (solved) {
-            return;
+            return false;
+          }
+
+          if (!expressionToCheck) {
+            expressionToCheck = currentExpression;
           }
 
           try {
@@ -1163,13 +1171,13 @@
                 "You must use all four numbers exactly once!",
                 "error"
               );
-              return;
+              return false;
             }
 
             // Check if the expression is valid
             if (expr.length === 0) {
               showMessage("Please enter an expression", "error");
-              return;
+              return false;
             }
 
             // Check for balanced parentheses
@@ -1178,7 +1186,7 @@
               (expr.match(/\)/g) || []).length
             ) {
               showMessage("Unbalanced parentheses", "error");
-              return;
+              return false;
             }
 
             // Evaluate the expression
@@ -1210,15 +1218,23 @@
               solved = true;
 
               setTimeout(nextRound, nextRoundDelay);
+
+              return true 
             } else {
               showMessage(`That equals ${result}, not 24. Try again!`, "error");
+
+              return false;
             }
           } catch (e) {
             showMessage(
               `Invalid expression. Please check your input. (Error: ${e})`,
               "error"
             );
+
+            return false;
           }
+
+          return false;
         }
 
         function showSolution() {
