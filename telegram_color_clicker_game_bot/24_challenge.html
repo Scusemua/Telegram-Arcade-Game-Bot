@@ -1133,11 +1133,13 @@
               usedNumbers.push(item.value);
 
               if (usedNumbers.length == 4) {
-                let correct = checkSolution(currentExpression);
+                const correct = checkSolution(currentExpression);
 
                 // Try adding the final closing parenthesis automatically.
                 if (!correct) {
-                  checkSolution([...currentExpression, ")"]);
+                  let value = ")";
+                  let type = "operator";
+                  checkSolution([...currentExpression, {value, type}]);
                 }
               }
             }
@@ -1149,6 +1151,7 @@
         }
 
         function checkSolution(expressionToCheck) {
+          console.log(`Checking solution: ${JSON.stringify(expressionToCheck)}`)
           if (solved) {
             return false;
           }
