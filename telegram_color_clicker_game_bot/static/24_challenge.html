@@ -316,11 +316,19 @@
   <body>
     <div class="container">
       <h1 class="title">24 Challenge</h1>
-      <div style="max-width: 75%; text-wrap: wrap; margin: 0 auto; text-align: center; justify-content: center;">
+      <div
+        style="
+          max-width: 75%;
+          text-wrap: wrap;
+          margin: 0 auto;
+          text-align: center;
+          justify-content: center;
+        "
+      >
         <p class="subtitle">
           Use all 4 numbers with ➕, ➖, ✖️, ➗ to make 24.
-          <br/>
-          <br/>
+          <br />
+          <br />
           Tap a value to select it, then tap another to swap it in-place.
         </p>
       </div>
@@ -616,6 +624,12 @@
 
         var op = new Array("*", "+", "/", "-");
 
+        // Game settings
+        const BASE_TIMER_SPEED = 550; // ms between updates (slower = faster timer)
+        const MAX_SPEED_MULTIPLIER = 4; // Maximum speed increase
+        const SPEED_INCREASE_RATE = 1.0 / 15.0; // How much speed increases per point
+        const INITIAL_TIMER_WIDTH = 100;
+
         // Game state
         let numbers = [];
         let usedNumbers = [];
@@ -625,26 +639,21 @@
         let timerInterval = null;
         let score = 0;
         let currentSpeedMultiplier = 1.0;
-        let timerWidth = 100;
+        let timerWidth = INITIAL_TIMER_WIDTH;
         let nextRoundDelay = 2000;
         let currentDifficulty = "";
         let currentProblemIndex = -1;
         let solved = false;
         let selectedItem = null;
 
-        // Game settings
-        const BASE_TIMER_SPEED = 550; // ms between updates (slower = faster timer)
-        const MAX_SPEED_MULTIPLIER = 4; // Maximum speed increase
-        const SPEED_INCREASE_RATE = 1.0 / 15.0; // How much speed increases per point
-
         const num_easy = easy_problems.length;
         const num_medium = medium_problems.length;
         const num_hard = hard_problems.length;
         const num_problems = num_easy + num_medium + num_hard;
 
-        const easy_odds = 50;
-        const medium_odds = 30;
-        const hard_odds = 20;
+        const easy_odds = 60;
+        const medium_odds = 25;
+        const hard_odds = 15;
 
         // DOM elements
         const cards = document.querySelectorAll(".card");
@@ -721,7 +730,7 @@
 
         function restart() {
           score = 0;
-          timerWidth = 100;
+          timerWidth = INITIAL_TIMER_WIDTH;
           giveUpBtn.style.display = "inline-block";
           timerEl.style.width = `${timerWidth}%`;
           timerEl.style.backgroundColor = "#4caf50";
@@ -742,10 +751,11 @@
         // Game functions
         function newGame() {
           giveUpBtn.style.display = "inline-block";
+          checkBtn.style.display = "inline-block";
           solved = false;
 
           // Reset game state
-          timerWidth = 100;
+          timerWidth = INITIAL_TIMER_WIDTH;
           timerEl.style.width = `${timerWidth}%`;
           timerEl.style.backgroundColor = "#4caf50";
           newGameBtn.style.display = "none";
@@ -1117,6 +1127,9 @@
         }
 
         function endGame() {
+          checkBtn.style.display = "none";
+          giveUpBtn.style.display = "none";
+
           clearInterval(timerInterval);
           setGameOver();
 
