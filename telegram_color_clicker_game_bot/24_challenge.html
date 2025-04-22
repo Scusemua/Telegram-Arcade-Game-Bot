@@ -272,8 +272,6 @@
         width: 20px;
         height: 20px;
         border-radius: 50%;
-        background-color: white;
-        border: 1px solid #ddd;
         font-size: 16px;
         display: flex;
         align-items: center;
@@ -284,14 +282,15 @@
       }
 
       .corner-btn:hover {
-        background-color: #f8f8f8;
+        background-color: rgb(221, 9, 9);
         transform: scale(1.1);
       }
 
       .close-btn {
         top: -8px;
         right: -8px;
-        color: #555;
+        color: #ffffff;
+        background-color: red;
         font-weight: bold;
         font-family: Arial, sans-serif;
       }
@@ -318,6 +317,10 @@
       <h1 class="title">24 Challenge</h1>
       <p class="subtitle">
         Use all four numbers with ➕, ➖, ✖️, ➗ to make 24.
+        <br/>
+        You can swap values in-place by first tapping a value to select 
+        <br/>
+        it before tapping the desired value to perform the swap.
       </p>
 
       <div class="controls">
@@ -1279,6 +1282,7 @@
             span.addEventListener("click", (e) => {
               if (span.classList.contains("expression-item--selected")) {
                 span.classList.remove("expression-item--selected");
+                selectedItem = null;
                 return;
               }
 
@@ -1300,36 +1304,42 @@
               e.preventDefault();
               e.stopPropagation();
 
+              // De-select the item before closing it.
+              if (span.classList.contains("expression-item--selected")) {
+                span.classList.remove("expression-item--selected");
+                selectedItem = null;
+              }
+
               const index = currentExpression.indexOf(item);
               currentExpression.splice(index, 1);
               updateExpression();
             });
             span.appendChild(closeButton);
 
-            const swapButton = document.createElement("span");
-            swapButton.className = "corner-btn swap-btn";
-            swapButton.textContent = "⇆";
-            swapButton.addEventListener("click", (e) => {
-              e.preventDefault();
-              e.stopPropagation();
+            // const swapButton = document.createElement("span");
+            // swapButton.className = "corner-btn swap-btn";
+            // swapButton.textContent = "⇆";
+            // swapButton.addEventListener("click", (e) => {
+            //   e.preventDefault();
+            //   e.stopPropagation();
 
-              if (span.classList.contains("expression-item--selected")) {
-                span.classList.remove("expression-item--selected");
-                selectedItem = null;
-                return;
-              }
+            //   if (span.classList.contains("expression-item--selected")) {
+            //     span.classList.remove("expression-item--selected");
+            //     selectedItem = null;
+            //     return;
+            //   }
 
-              // Remove selection from all items
-              document
-                .querySelectorAll(".expression-item")
-                .forEach((i) =>
-                  i.classList.remove("expression-item--selected")
-                );
+            //   // Remove selection from all items
+            //   document
+            //     .querySelectorAll(".expression-item")
+            //     .forEach((i) =>
+            //       i.classList.remove("expression-item--selected")
+            //     );
 
-              span.classList.add("expression-item--selected");
-              selectedItem = item;
-            });
-            span.appendChild(swapButton);
+            //   span.classList.add("expression-item--selected");
+            //   selectedItem = item;
+            // });
+            // span.appendChild(swapButton);
 
             expressionEl.appendChild(span);
 
