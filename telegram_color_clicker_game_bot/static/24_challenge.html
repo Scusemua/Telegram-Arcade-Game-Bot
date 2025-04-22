@@ -70,7 +70,7 @@
         transform: translateY(-5px);
       }
 
-      .card.selected {
+      .card.clicked {
         background: linear-gradient(145deg, #ffd86f, #fc6262);
         color: white;
       }
@@ -159,8 +159,38 @@
       }
 
       .expression-item {
+        position: relative;
+        width: 20px;
+        height: 40px;
+        background-color: #f0f0f0;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin: 0.5rem;
         padding: 5px 10px;
-        border-radius: 5px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background-color: white;
+        user-select: none;
+      }
+
+      .expression-item:hover {
+        background-color: #f8f9fa;
+        transform: translateY(-2px);
+      }
+
+      .expression-item--selected {
+        background-color: #e3f2fd;
+        border-color: #2196f3;
+        padding: 10px 20px;
+        box-shadow: 0 4px 6px -1px rgba(33, 150, 243, 0.2);
+        animation: gentleBounce 2s ease-in-out infinite;
+      }
+
+      .expression-item--selected:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.4);
       }
 
       .number {
@@ -233,6 +263,51 @@
           height: 50px;
           font-size: 20px;
           padding: 0px;
+        }
+      }
+
+      .corner-btn {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: white;
+        border: 1px solid #ddd;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
+      }
+
+      .corner-btn:hover {
+        background-color: #f8f8f8;
+        transform: scale(1.1);
+      }
+
+      .close-btn {
+        top: -8px;
+        right: -8px;
+        color: #555;
+        font-weight: bold;
+        font-family: Arial, sans-serif;
+      }
+
+      .swap-btn {
+        bottom: -8px;
+        right: -8px;
+        color: #555;
+      }
+
+      @keyframes gentleBounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-4px);
         }
       }
     </style>
@@ -549,6 +624,7 @@
         let currentDifficulty = "";
         let currentProblemIndex = -1;
         let solved = false;
+        let selectedItem = null;
 
         // Game settings
         const BASE_TIMER_SPEED = 550; // ms between updates (slower = faster timer)
@@ -597,9 +673,30 @@
 
         operationBtns.forEach((btn) => {
           if (btn.id !== "clear" && btn.id !== "backspace") {
-            btn.addEventListener("click", () =>
-              addToExpression(btn.dataset.op, "operator")
-            );
+            btn.addEventListener("click", () => {
+              if (selectedItem) {
+                const index = currentExpression.indexOf(selectedItem);
+                if (index >= 0) {
+                  const value = btn.dataset.op;
+                  const type = "operator";
+                  currentExpression[index] = { value, type };
+
+                  console.log(
+                    `Swapping "${selectedItem.value}" with "${value}".`
+                  );
+                  console.log(JSON.stringify(currentExpression));
+
+                  updateExpression();
+                }
+
+                selectedItem = null;
+                console.log(JSON.stringify(currentExpression));
+
+                return;
+              }
+
+              addToExpression(btn.dataset.op, "operator");
+            });
           }
         });
 
@@ -669,6 +766,32 @@
           return array[randomIndex];
         }
 
+        function countStr(str, char) {
+          let count = 0;
+          for (let i = 0; i < str.length; i++) {
+            if (str[i] == char) {
+              count += 1;
+            }
+          }
+
+          return count;
+        }
+
+        function countParentheses(str) {
+          let openCount = 0;
+          let closeCount = 0;
+
+          for (let i = 0; i < str.length; i++) {
+            if (str[i] === "(") {
+              openCount++;
+            } else if (str[i] === ")") {
+              closeCount++;
+            }
+          }
+
+          return { open: openCount, close: closeCount };
+        }
+
         function shuffle(array) {
           let currentIndex = array.length;
 
@@ -693,17 +816,23 @@
 
           if (n <= easy_odds) {
             currentDifficulty = "Easy";
-            currentProblemIndex = Math.floor(Math.random() * easy_problems.length);
+            currentProblemIndex = Math.floor(
+              Math.random() * easy_problems.length
+            );
             problem = easy_problems[currentProblemIndex];
             difficultyMultiplier = 0.75;
           } else if (n <= medium_odds) {
             currentDifficulty = "Medium";
-            currentProblemIndex = Math.floor(Math.random() * medium_problems.length);
+            currentProblemIndex = Math.floor(
+              Math.random() * medium_problems.length
+            );
             problem = medium_problems[currentProblemIndex];
             difficultyMultiplier = 1.0;
           } else {
             currentDifficulty = "Hard";
-            currentProblemIndex = Math.floor(Math.random() * hard_problems.length);
+            currentProblemIndex = Math.floor(
+              Math.random() * hard_problems.length
+            );
             problem = hard_problems[currentProblemIndex];
             difficultyMultiplier = 1.25;
           }
@@ -984,7 +1113,7 @@
         function endGame() {
           clearInterval(timerInterval);
           setGameOver();
-          
+
           // Add back all of the problems.
           easy_problems.push.apply(completed_easy);
           medium_problems.push.apply(completed_medium);
@@ -1048,11 +1177,27 @@
           // Check if the number is already used
           const usedCount = usedNumbers.filter((n) => n == number).length;
           const totalCount = numbers.filter((n) => n == number).length;
-          console.log(`usedCount: ${usedCount}`);
-          console.log(`totalCount: ${totalCount}`);
 
           if (usedCount > 0 && usedCount >= totalCount) {
             showMessage(`You've already used all ${number}s`, "error");
+            return;
+          }
+
+          if (selectedItem) {
+            const index = currentExpression.indexOf(selectedItem);
+            if (index >= 0) {
+              const value = number;
+              const type = "number";
+              console.log(`Before: ${JSON.stringify(currentExpression)}`);
+              currentExpression[index] = { value, type };
+
+              console.log(`Swapping "${selectedItem.value}" with "${number}"`);
+              console.log(`After: ${JSON.stringify(currentExpression)}`);
+
+              updateExpression();
+            }
+
+            selectedItem = undefined;
             return;
           }
 
@@ -1060,8 +1205,8 @@
           addToExpression(number, "number");
 
           // Visual feedback
-          card.classList.add("selected");
-          setTimeout(() => card.classList.remove("selected"), 300);
+          card.classList.add("clicked");
+          setTimeout(() => card.classList.remove("clicked"), 400);
         }
 
         function addToExpression(value, type) {
@@ -1120,29 +1265,95 @@
         }
 
         function updateExpression() {
+          console.log(`updateExpression: ${JSON.stringify(currentExpression)}`);
           expressionEl.innerHTML = "";
           usedNumbers = [];
 
           currentExpression.forEach((item) => {
+            console.log(item);
             const span = document.createElement("span");
             span.textContent = item.value;
             span.className = `expression-item ${item.type}`;
+
+            span.addEventListener("click", (e) => {
+              if (span.classList.contains("expression-item--selected")) {
+                span.classList.remove("expression-item--selected");
+                return;
+              }
+
+              // Remove selection from all items
+              document
+                .querySelectorAll(".expression-item")
+                .forEach((i) =>
+                  i.classList.remove("expression-item--selected")
+                );
+
+              span.classList.add("expression-item--selected");
+              selectedItem = item;
+            });
+
+            const closeButton = document.createElement("span");
+            closeButton.className = "corner-btn close-btn";
+            closeButton.textContent = "🗙";
+            closeButton.addEventListener("click", (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+
+              const index = currentExpression.indexOf(item);
+              currentExpression.splice(index, 1);
+              updateExpression();
+            });
+            span.appendChild(closeButton);
+
+            const swapButton = document.createElement("span");
+            swapButton.className = "corner-btn swap-btn";
+            swapButton.textContent = "⇆";
+            swapButton.addEventListener("click", (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+
+              if (span.classList.contains("expression-item--selected")) {
+                span.classList.remove("expression-item--selected");
+                selectedItem = null;
+                return;
+              }
+
+              // Remove selection from all items
+              document
+                .querySelectorAll(".expression-item")
+                .forEach((i) =>
+                  i.classList.remove("expression-item--selected")
+                );
+
+              span.classList.add("expression-item--selected");
+              selectedItem = item;
+            });
+            span.appendChild(swapButton);
+
             expressionEl.appendChild(span);
 
             if (item.type === "number") {
               usedNumbers.push(item.value);
 
               if (usedNumbers.length == 4) {
-                const correct = checkSolution(currentExpression);
-
                 // Try adding the final closing parenthesis automatically.
+                // We do this first, as the user may have already added it, which
+                // will result in an error. We don't want to display that error for this check,
+                // since we're the ones that added the final closing parenthesis.
+                let value = ")";
+                let type = "operator";
+                const correct = checkSolution([
+                  ...currentExpression,
+                  { value, type },
+                ]);
+
                 if (!correct) {
-                  let value = ")";
-                  let type = "operator";
-                  checkSolution([...currentExpression, {value, type}]);
+                  checkSolution(currentExpression);
                 }
               }
             }
+
+            console.log(usedNumbers);
           });
         }
 
@@ -1151,7 +1362,9 @@
         }
 
         function checkSolution(expressionToCheck) {
-          console.log(`Checking solution: ${JSON.stringify(expressionToCheck)}`)
+          console.log(
+            `Checking solution: ${JSON.stringify(expressionToCheck)}`
+          );
           if (solved) {
             return false;
           }
@@ -1188,12 +1401,14 @@
               return false;
             }
 
+            const parenthesisCounts = countParentheses(expr);
+
             // Check for balanced parentheses
-            if (
-              (expr.match(/\(/g) || []).length !==
-              (expr.match(/\)/g) || []).length
-            ) {
-              showMessage("Unbalanced parentheses", "error");
+            if (parenthesisCounts.open !== parenthesisCounts.close) {
+              showMessage(
+                `Unbalanced parentheses (open: ${parenthesisCounts.open}, close: ${parenthesisCounts.close}) in expression "${expr}"`,
+                "error"
+              );
               return false;
             }
 
@@ -1227,7 +1442,7 @@
 
               setTimeout(nextRound, nextRoundDelay);
 
-              return true 
+              return true;
             } else {
               showMessage(`That equals ${result}, not 24. Try again!`, "error");
 
