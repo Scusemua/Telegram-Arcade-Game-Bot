@@ -29,6 +29,7 @@ def main():
     parser.add_argument("--port", type=int, default=8082, help="HTTP port.")
     parser.add_argument("--run-http-server", action='store_true',
                         help="If true, then run HTTP backend server.")
+    parser.add_argument("--no-bot", action = 'store_true', help = "If passed, then do not run the Telegram bot.")
 
     args = parser.parse_args()
 
@@ -51,10 +52,14 @@ def main():
         game_url=game_url, token=token, http_port=args.port)
 
     if args.run_http_server:
-        # Start bot polling in background
-        Thread(target=bot.run_http_server, daemon=True).start()
+        if not args.no_bot:
+            # Start bot polling in background
+            Thread(target=bot.run_http_server, daemon=True).start()
+        else:
+            bot.run_http_server()
 
-    bot.run()
+    if not args.no_bot:
+        bot.run()
 
 
 if __name__ == "__main__":
