@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+    <title>Color Clicker Game</title>
+    <link rel="stylesheet" href="color_clicker/color_clicker.css" />
+  </head>
+  <body>
+    <div class="game-container">
+      <h1>🎨 Color Clicker Game</h1>
+      <p>Click the rectangles whose label matches their color!</p>
+
+      <div class="score-container">
+        <div class="score-box">Score: <span id="score">0</span></div>
+        <div class="score-box">
+          Personal Best: <span id="highScore">0</span>
+        </div>
+      </div>
+      <div class="difficulty">🚀 Speed: <span id="difficulty">1x</span></div>
+      <div class="timer" id="timer"></div>
+
+      <div class="color-options" id="colorOptions">
+        <!-- Color boxes will be inserted here by JavaScript -->
+      </div>
+
+      <div class="message" id="message"></div>
+
+      <button class="start-btn" id="startBtn">Start Game</button>
+    </div>
+    <script src="color_clicker/color_clicker.js"></script>
+  </body>
+</html>

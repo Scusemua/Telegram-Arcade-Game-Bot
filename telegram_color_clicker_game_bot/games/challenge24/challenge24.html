@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>24 Puzzle Game</title>
+    <link rel="stylesheet" href="challenge24/challenge24.css">
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="title">24 Challenge</h1>
+      <div
+        style="
+          max-width: 75%;
+          text-wrap: wrap;
+          margin: 0 auto;
+          text-align: center;
+          justify-content: center;
+        "
+      >
+        <p class="subtitle">
+          Use all 4 numbers with ➕, ➖, ✖️, ➗ to make 24.
+          <br />
+          <br />
+          Tap a value to select it, then tap another to swap it in-place.
+        </p>
+      </div>
+
+      <div class="controls">
+        <div class="difficulty">
+          <b>😫 Difficulty:</b> <span id="difficulty"></span>
+        </div>
+
+        <div class="score"><b>🔥 Score:</b> <span id="score"></span></div>
+
+        <div class="speed"><b>🚀 Speed:</b> <span id="speed"></span></div>
+      </div>
+
+      <div class="timer" id="timer"></div>
+
+      <div class="cards-container">
+        <div class="cards" id="required-cards">
+          <div class="card required-card" data-number="">?</div>
+          <div class="card required-card" data-number="">?</div>
+          <div class="card required-card" data-number="">?</div>
+          <div class="card required-card" data-number="">?</div>
+        </div>
+        <div class="cards" id="custom-cards"></div>
+      </div>
+
+      <div class="expression" id="expression"></div>
+
+      <div class="operations">
+        <button class="operation" data-op="+">+</button>
+        <button class="operation" data-op="-">-</button>
+        <button class="operation" data-op="×">×</button>
+        <button class="operation" data-op="÷">÷</button>
+      </div>
+      <div class="operations">
+        <button class="operation" data-op="(">(</button>
+        <button class="operation" data-op=")">)</button>
+        <button class="operation" id="equals" data-op="equals">=</button>
+        <button class="operation" id="backspace" data-op="backspace">⌫</button>
+        <button class="operation" id="clear">C</button>
+      </div>
+
+      <div class="controls">
+        <button id="check">Check</button>
+        <button id="give-up">Give Up</button>
+        <button id="new-game" style="display: none">New Game</button>
+        <!-- <button id="solution">Show Solution</button> -->
+      </div>
+
+      <div class="message" id="message"></div>
+    </div>
+
+    <script src="challenge24/challenge24.js"></script>
+  </body>
+</html>

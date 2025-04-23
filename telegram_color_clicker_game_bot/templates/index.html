@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram Game Bot - Play Fun HTML5 Games</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap">
-    <link rel="stylesheet" href="/static/index.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
 </head>
 <body>
     <div class="container">
@@ -21,7 +21,7 @@
                 <div class="game-content">
                     <h3 class="game-title">🎨 Color Clicker</h3>
                     <p class="game-description">Test your reflexes in this fast-paced color matching game. Identify the correct color as quickly as possible to score points!</p>
-                    <a href="/static/color_clicker.html" class="play-button" style="background-color: #4a6fa5; background-image: linear-gradient(-135deg, #4a6fa5 0%, #253b6e 100%);">Play</a>
+                    <a href="{{ url_for('serve_game', game_name='color_clicker') }}" class="play-button" style="background-color: #4a6fa5; background-image: linear-gradient(-135deg, #4a6fa5 0%, #253b6e 100%);">Play</a>
                 </div>
             </div>
 
@@ -31,7 +31,7 @@
                 <div class="game-content">
                     <h3 class="game-title">➗ 24 Challenge</h3>
                     <p class="game-description">A math puzzle game where you combine four numbers using basic operations to make 24. I hope you're good at math!</p>
-                    <a href="/static/24_challenge.html" class="play-button" style="background-color: #f54ea2; background-image: linear-gradient(-135deg, #f54ea2 0%, #ff7676 100%);">Play</a>
+                    <a href="{{ url_for('serve_game', game_name='challenge24') }}" class="play-button" style="background-color: #f54ea2; background-image: linear-gradient(-135deg, #f54ea2 0%, #ff7676 100%);">Play</a>
                 </div>
             </div>
 
@@ -41,7 +41,7 @@
                 <div class="game-content">
                     <h3 class="game-title">⌨️ Speed Words</h3>
                     <p class="game-description">Given a string of characters, you must quickly enter an English word that contains that string.</p>
-                    <a href="/static/speed_words.html" class="play-button" style="background-image: linear-gradient(-135deg, #f1c044 0%, #e98b3e 100%);">Play</a>
+                    <a href="{{ url_for('serve_game', game_name='speed_words') }}" class="play-button" style="background-image: linear-gradient(-135deg, #f1c044 0%, #e98b3e 100%);">Play</a>
                 </div>
             </div>
         </div>

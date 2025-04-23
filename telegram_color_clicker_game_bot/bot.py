@@ -5,7 +5,7 @@ import requests
 from typing import List 
 from uuid import uuid4
 from typing import Dict, Any
-from flask import Flask, send_from_directory, jsonify, abort
+from flask import Flask, send_from_directory, jsonify, abort, render_template
 from telegram import InlineQueryResultGame, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, CallbackQueryHandler, InlineQueryHandler, ApplicationBuilder
 
@@ -109,7 +109,7 @@ class TelegramBot(object):
         
         inline_message_id = callback_query.inline_message_id or ""
 
-        url: str = f'{self._game_url}/game/{game_short_name}?user_id={user_id}&chat_id={chat_id}&inline_message_id={inline_message_id}&message_id={message_id}'
+        url: str = f'{self._game_url}/games/{game_short_name}?user_id={user_id}&chat_id={chat_id}&inline_message_id={inline_message_id}&message_id={message_id}'
 
         self.logger.debug(f'url: "{url}"')
 
@@ -132,7 +132,7 @@ class TelegramBot(object):
         )
 
     def run_http_server(self):
-        app = Flask(__name__, static_url_path = "/static")
+        app = Flask(__name__)
         CORS(app)  # Allow all origins
         
         @app.route('/api/highscores', methods=['GET'])
@@ -217,29 +217,30 @@ class TelegramBot(object):
             self.logger.debug(f'Response from Telegram: {response.json()}')
             return jsonify(response.json())
         
+        @app.route('/')
+        def home():
+            return render_template('index.html')
+        
         @app.route("/games")
         def serve_games():
-            return send_from_directory(".", "index.html")
+            return render_template('index.html')
 
-        @app.route("/game/<game_name>")
+        @app.route('/games/<game_name>/<path:filename>')
+        def serve_game_assets(game_name, filename):
+            return send_from_directory(f'games/{game_name}', filename)
+
+        @app.route("/games/<game_name>")
         def serve_game(game_name):
             self.logger.debug(f'Serving game: "{game_name}"')
             
             if game_name not in GAMES:
                 self.logger.warning(f'Invalid game: "{game_name}". Valid games: {",".join(GAMES)}')
-                abort(code=400, args=f'Invalid game: "{game_name}"')
+                abort(400, f'Invalid game: "{game_name}"')
             
-            if game_name == COLOR_CLICKER_SHORT_NAME:
-                return send_from_directory(".", "color_clicker.html")
-            elif game_name == CHALLENGE_24_SHORT_NAME:
-                return send_from_directory(".", "24_challenge.html")
-            elif game_name == WORD_GAME_SHORT_NAME:
-                return send_from_directory(".", "speed_words.html")
-            
-            abort(code=400, args=f'Invalid game: "{game_name}"')
+            return send_from_directory(f"games/{game_name}", f"{game_name}.html")
 
         app.run(host="0.0.0.0", port=self._http_port,
-                debug=False, use_reloader=False)
+                debug=True, use_reloader=False)
 
     def run(self):
         # ensure_event_loop()

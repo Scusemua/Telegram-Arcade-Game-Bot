@@ -1,0 +1,237 @@
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+  }
+
+  .game-container {
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 30px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    text-align: center;
+  }
+
+  h1 {
+    margin-top: 0;
+    font-weight: 600;
+    font-size: 2.2rem;
+  }
+
+  .sequence-display {
+    font-size: 3rem;
+    font-weight: bold;
+    margin: 30px 0;
+    letter-spacing: 5px;
+    color: #ffcc00;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  }
+
+  .input-container {
+    margin: 20px 0;
+  }
+
+  input {
+    width: 80%;
+    padding: 15px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.2rem;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    outline: none;
+    transition: all 0.3s;
+  }
+
+  input:focus {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.02);
+  }
+
+  input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .stats {
+    display: flex;
+    justify-content: space-around;
+    margin: 30px 0;
+  }
+
+  .stat-box {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 10px;
+    min-width: 75px;
+  }
+
+  .stat-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin: 5px 0;
+  }
+
+  .stat-label {
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+
+  .timer-container {
+    height: 10px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    margin: 20px 0;
+    overflow: hidden;
+  }
+
+  .timer-bar {
+    height: 100%;
+    width: 100%;
+    background-color: #4caf50;
+    transition: width 0.1s linear;
+  }
+
+  .message {
+    min-height: 24px;
+    margin: 10px 0;
+    font-weight: bold;
+    color: #ffcc00;
+  }
+
+  .start-btn {
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 20px;
+    font-weight: bold;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .start-btn:hover {
+    background-color: #ff5252;
+    transform: translateY(-2px);
+  }
+
+  .start-btn:active {
+    transform: translateY(0);
+  }
+
+  /* Base styles for the info button */
+  .info-button {
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+    margin: 0 5px;
+  }
+
+  /* The info icon (circle with 'i') */
+  .info-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #3498db;
+    color: white;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    font-size: 14px;
+    text-align: center;
+    line-height: 1;
+    transition: background-color 0.3s;
+  }
+
+  /* Hover effect for the icon */
+  .info-button:hover .info-icon {
+    background-color: #2980b9;
+  }
+
+  /* The tooltip that appears on hover/click */
+  .info-tooltip {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 10px;
+    padding: 10px;
+    width: 300px;
+    background-color: #333;
+    color: white;
+    border-radius: 4px;
+    font-size: 14px;
+    line-height: 1.4;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+    z-index: 100;
+  }
+
+  /* Arrow for the tooltip */
+  .info-tooltip::after {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #333 transparent;
+  }
+
+  /* Show tooltip on hover */
+  .info-button:hover .info-tooltip {
+    opacity: 0.95;
+    visibility: visible;
+  }
+
+  /* Show tooltip when active (clicked) */
+  .info-button.active .info-tooltip {
+    opacity: 0.95;
+    visibility: visible;
+  }
+
+  /* Mobile-friendly: show tooltip below on small screens */
+  @media (max-width: 480px) {
+    .info-tooltip {
+      left: 0;
+      transform: none;
+      width: 180px;
+    }
+
+    .info-tooltip::after {
+      left: 15px;
+      transform: none;
+    }
+  }
+
+  .side-by-side {
+    margin: auto;
+  }
+
+  .left-side {
+    float: left;
+  }
+
+  .right-side {
+    float: right;
+  }
+
+  #clear {
+    clear: both;
+  }

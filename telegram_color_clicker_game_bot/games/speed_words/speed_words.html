@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Word Sequence Challenge</title>
+    <link rel="stylesheet" href="speed_words/speed_words.css">
+  </head>
+  <body>
+    <div class="game-container">
+      <div class="side-by-side">
+        <div id="first">
+          <h1>Word Sequence Challenge</h1>
+        </div>
+        <div id="second">
+          <span class="info-button" onclick="this.classList.toggle('active')">
+            <span class="info-icon">i</span>
+            <span class="info-tooltip">
+              The amount of time you get back for a correct word is increased by
+              the following:
+              <ul style="text-align: left">
+                <li>Having a larger streak</li>
+                <li>
+                  Having a larger speed multiplier (increases for each correct
+                  word)
+                </li>
+                <li>Entering longer words</li>
+              </ul>
+            </span>
+          </span>
+        </div>
+        <div id="clear"></div>
+      </div>
+
+      <div class="sequence-display" id="sequence">---</div>
+      <div class="message" id="message"></div>
+      <div class="input-container">
+        <input
+          type="text"
+          id="word-input"
+          placeholder="Type a word containing the sequence..."
+          disabled
+        />
+      </div>
+      <div class="timer-container">
+        <div class="timer-bar" id="timer-bar"></div>
+      </div>
+      <div class="stats">
+        <div class="stat-box">
+          <div class="stat-value" id="score">0</div>
+          <div class="stat-label">Score</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="speed">0</div>
+          <div class="stat-label">Speed</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="streak">0</div>
+          <div class="stat-label">Streak</div>
+        </div>
+      </div>
+      <button class="start-btn" id="start-btn">Start Game</button>
+    </div>
+    <script src="speed_words/speed_words.js"></script>
+  </body>
+</html>
