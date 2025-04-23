@@ -182,8 +182,16 @@ class TelegramBot(object):
             self.logger.debug(f"Received POST data: {data}")
 
             # Required 
-            user_id = data['user_id']
-            score = data['score']
+            user_id = data.get('user_id', None)
+            score = data.get('score', None)
+            
+            if user_id is None:
+                abort(400, f'Missing user ID')
+                return 
+            
+            if score is None:
+                abort(400, f'Missing score')
+                return 
             
             # Optional
             inline_message_id = data.get("inline_message_id", "")

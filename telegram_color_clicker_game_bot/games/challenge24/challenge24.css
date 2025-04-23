@@ -166,13 +166,13 @@ body {
 
   .expression-item {
     position: relative;
-    width: 16px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     background-color: #f0f0f0;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     margin: 0.2rem;
-    padding: 5px 10px;
+    padding: 0px;
     font-weight: bold;
     border: 2px solid #ddd;
     border-radius: 8px;

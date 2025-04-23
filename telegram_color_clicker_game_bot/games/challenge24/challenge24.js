@@ -804,39 +804,53 @@ document.addEventListener("DOMContentLoaded", function () {
   function onCardClicked(card) {
     selectNumber(card.dataset.number);
 
+    // Add to expression
+    addToExpression(card.dataset.number, "number");
+
     // Visual feedback
     card.classList.add("clicked");
     setTimeout(() => card.classList.remove("clicked"), 400);
   }
 
+  function swapSelectedItem(number) {
+    const index = currentExpression.indexOf(selectedItem);
+    if (index >= 0) {
+      const value = number;
+      const type = "number";
+      currentExpression[index] = { value, type };
+
+      updateExpression();
+    }
+
+    selectedItem = undefined;
+    return;
+  }
+
   function selectNumber(number) {
-    console.log(`Selected ${number} from ${numbers}`);
+    if (!numbers.includes(Number.parseInt(number))) {
+      console.error(`Selected unknown number or value "${number}"`);
+      return;
+    }
+
+    console.log(`Selected ${number} from ${numbers} (used: ${usedNumbers})`);
 
     // Check if the number is already used
     const usedCount = usedNumbers.filter((n) => n == number).length;
     const totalCount = numbers.filter((n) => n == number).length;
 
     if (usedCount > 0 && usedCount >= totalCount) {
-      showMessage(`You've already used all ${number}s`, "error");
+      showMessage(
+        `You've already used all ${totalCount} ${number}s (used=${usedCount})`,
+        "error"
+      );
       return;
     }
 
     if (selectedItem) {
-      const index = currentExpression.indexOf(selectedItem);
-      if (index >= 0) {
-        const value = number;
-        const type = "number";
-        currentExpression[index] = { value, type };
-
-        updateExpression();
-      }
-
-      selectedItem = undefined;
-      return;
+      swapSelectedItem(number);
     }
 
-    // Add to expression
-    addToExpression(number, "number");
+    usedNumbers.push(number);
   }
 
   function addToExpression(value, type) {
@@ -854,6 +868,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function backspaceExpression() {
     if (currentExpression.length == 0) {
+      console.log("current expression is empty");
       return;
     }
 
@@ -896,7 +911,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function updateExpression() {
     expressionEl.innerHTML = "";
-    usedNumbers = [];
 
     currentExpression.forEach((item) => {
       console.log(item);
@@ -933,8 +947,15 @@ document.addEventListener("DOMContentLoaded", function () {
           selectedItem = null;
         }
 
-        const index = currentExpression.indexOf(item);
+        let index = currentExpression.indexOf(item);
         currentExpression.splice(index, 1);
+        index = usedNumbers.indexOf(item.value);
+        const removed = usedNumbers.splice(index, 1);
+
+        console.log(
+          `Removed number ${item.value} from used numbers: ${usedNumbers}. Removed: ${removed}`
+        );
+
         updateExpression();
       });
       span.appendChild(closeButton);
@@ -967,8 +988,6 @@ document.addEventListener("DOMContentLoaded", function () {
       expressionEl.appendChild(span);
 
       if (item.type === "number") {
-        usedNumbers.push(item.value);
-
         if (usedNumbers.length == 4) {
           // Try adding the final closing parenthesis automatically.
           // We do this first, as the user may have already added it, which
@@ -1043,6 +1062,12 @@ document.addEventListener("DOMContentLoaded", function () {
     customCardsContainer.appendChild(customCard);
 
     currentExpression = [];
+
+    const value = result;
+    const type = "number";
+
+    currentExpression.push({ value, type });
+
     updateExpression();
 
     // const value = result;
@@ -1053,26 +1078,34 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function onCustomCardClicked(customCard) {
     console.log(
-      `onCustomCardClicked: clicked custom card ${customCard.dataset.number} created using the following numbers: ${customCard.dataset.numbersUsed}`
+      `onCustomCardClicked: clicked custom card ${
+        customCard.dataset.number
+      } created using the following numbers: ${JSON.stringify(
+        customCard.dataset.numbersUsed
+      )}`
     );
 
     Array.from(customCard.dataset.numbersUsed).forEach((val) =>
       selectNumber(val)
     );
 
-    const value = customCard.dataset.number;
-    const type = "number";
+    addToExpression(customCard.dataset.number, "number");
+
     currentExpression.push({ value, type });
 
     console.log(
-      `onCustomCardClicked: current expression: "${currentExpression}"`
+      `onCustomCardClicked: current expression: "${JSON.stringify(
+        currentExpression
+      )}"`
     );
 
-    updateExpression();
+    // updateExpression();
   }
 
   function checkSolution(expressionToCheck) {
-    console.log(`Checking solution: ${JSON.stringify(expressionToCheck)}`);
+    console.log(
+      `Checking solution: ${JSON.stringify(JSON.stringify(expressionToCheck))}`
+    );
     if (solved) {
       return false;
     }
