@@ -17,9 +17,10 @@ from flask_cors import CORS
 COLOR_CLICKER_SHORT_NAME: str = "color_clicker"
 CHALLENGE_24_SHORT_NAME: str = "challenge24"
 WORD_GAME_SHORT_NAME: str = "speed_words"
+FLYING_TURTLE_SHORT_NAME: str = "flying_turtle"
 
 GAMES: List[str] = [
-    COLOR_CLICKER_SHORT_NAME, CHALLENGE_24_SHORT_NAME, WORD_GAME_SHORT_NAME
+    COLOR_CLICKER_SHORT_NAME, CHALLENGE_24_SHORT_NAME, WORD_GAME_SHORT_NAME, FLYING_TURTLE_SHORT_NAME
 ]
 
 LOGGER_FORMAT: str = '%(asctime)s | %(levelname)s | %(message)s | %(name)s | %(funcName)s'
@@ -69,7 +70,9 @@ class TelegramBot(object):
             InlineQueryResultGame(
                 id=str(uuid4()), game_short_name=CHALLENGE_24_SHORT_NAME),
             InlineQueryResultGame(
-                id=str(uuid4()), game_short_name=WORD_GAME_SHORT_NAME)
+                id=str(uuid4()), game_short_name=WORD_GAME_SHORT_NAME),
+            InlineQueryResultGame(
+                id=str(uuid4()), game_short_name=FLYING_TURTLE_SHORT_NAME),
         ]
         await update.inline_query.answer(results, cache_time=0)
 
